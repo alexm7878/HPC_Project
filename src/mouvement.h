@@ -10,6 +10,12 @@
 	#include <ctype.h> 
 	#include <time.h>
 
+	#include "nrdef.h"
+	#include "vnrdef.h"
+	#include "nrutil.h"
+
+
+
 	#define TETA 10
 		
 	#define VMAX 50
@@ -32,10 +38,10 @@
 	}image_t;
 
 
-	uint8_t** ui8matrix(long nrl, long nrh, long ncl, long nch);
 	uint8_t convLogicToBin(uint8_t t);
 	uint8_t convBinToLogic(uint8_t t);
 	void initImage_t(image_t* Image, int w, int h,int intensity);
+	void freeImage_t(image_t* Image);
 	int readPGM(char* NomFichier, image_t* ImgRead);
 	void FD_1_Step(image_t* ImgRead1, image_t* ImgRead, image_t* dif);
 

@@ -20,9 +20,7 @@ void morpho_Erosion3_3(image_t* in, image_t* out)
 			}
 			out->data[i][j] = res;
 		}
-
 	}
-
 }
 
 // OR 

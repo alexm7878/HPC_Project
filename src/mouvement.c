@@ -1,28 +1,12 @@
 #include "mouvement.h"
 #include "morpho.h"
 #include "benchmark.h"
-uint8_t** ui8matrix(long nrl, long nrh, long ncl, long nch)
-/* --------------------------------------------------- */
-/* allocate an uint8 matrix with subscript range m[nrl..nrh][ncl..nch] */
-{
-  long i, nrow=nrh-nrl+1,ncol=nch-ncl+1;
-  uint8_t **m;
+#include "mouvement_SSE2.h"
+#include "nrdef.h"
+#include "vnrdef.h"
+#include "nrutil.h"
 
-  /* allocate pointers to rows */
-  m=(uint8_t **) malloc((size_t)((nrow)*sizeof(uint8_t*)));
-  m += 0;
-  m -= nrl;
 
-  /* allocate rows and set pointers to them */
-  m[nrl]=(uint8_t *) malloc((size_t)((nrow*ncol)*sizeof(uint8_t)));
-  m[nrl] += 0;
-  m[nrl] -= ncl;
-
-  for(i=nrl+1;i<=nrh;i++) m[i]=m[i-1]+ncol;
-
-  /* return pointer to array of pointers to rows */
-  return m;
-}
 
 
 uint8_t convLogicToBin(uint8_t t)
@@ -44,12 +28,29 @@ uint8_t convBinToLogic(uint8_t t)
 //Initialisation d'une variable image_t
 void initImage_t(image_t* Image, int w, int h,int intensity)
 {
+	int i,j;
+			//Image = (image_t*) malloc(sizeof(image_t));
 			Image->w = w;
 			Image->h=h;
 			Image->maxInt = intensity;
 
 			//Allocation de la matrice 
-			Image->data = ui8matrix(-2,h+2,-2,w+2);
+			Image->data =ui8matrix(-2,h+2,-2,w+2);
+
+			for(i=-2;i<h+3;i++)
+			{
+				for(j=-2; j<w+3;j++)
+				{
+					Image->data[i][j] = 0;
+				}
+			}
+}
+
+void freeImage_t(image_t* Image)
+{
+		free_ui8matrix(Image->data,-2,Image->h+2,-2,Image->w+2);
+
+		free(Image);
 }
 
 
@@ -155,7 +156,7 @@ void writePGM(image_t* dif, int k, char* dossier)
 
 	FILE* fp;
 	int i,j;
-	char nomFichier[50];
+	char nomFichier[50] = "";
 
 	Conc(dossier,k,nomFichier);
 
@@ -173,7 +174,10 @@ void writePGM(image_t* dif, int k, char* dossier)
 				fprintf(fp,"%c",dif->data[i][j]);
 			}
 		}	
+		//fclose(fp);
 	}
+	
+
 }
 
 
@@ -185,14 +189,14 @@ void FD_Full_Step_NO_Morpho()
 	image_t ImgRead1;
 	image_t dif;
 	int i;
-
-	char nomFichier[50];
-	char nomFichier2[50];
+	char nomFichier[50] ="";
+	char nomFichier2[50] ="";
 
 	readPGM("car3/car_3000.pgm",&ImgRead);
 		
-
 	initImage_t(&dif,ImgRead.w,ImgRead.h,ImgRead.maxInt);
+
+
 
 	for(i=0;i<199;i++){
 		Conc("car3/car_",3000+i,nomFichier);
@@ -207,18 +211,19 @@ void FD_Full_Step_NO_Morpho()
 		writePGM(&dif,i,"FD/FDcar_");
 	}
 	//printf("Fin FD sans morpho\n");
+	//freeImage_t(&ImgRead);
 }
 
 void FD_Full_Step_Morpho3_3()
 {
-	printf("Demarage FD morpho 3_3\n");
+	//printf("Demarage FD morpho 3_3\n");
 	image_t ImgRead;
 	image_t ImgRead1;
 	image_t dif, out,inter;
 	int i;
 
-	char nomFichier[50];
-	char nomFichier2[50];
+	char nomFichier[50]="";
+	char nomFichier2[50]="";
 
 	readPGM("car3/car_3000.pgm",&ImgRead);
 		
@@ -241,17 +246,15 @@ void FD_Full_Step_Morpho3_3()
 
 		//morpho_Erosion3_3(&dif,&out);
 		//morpho_Dilatation3_3(&out,&dif);
-		fermeture3_3(&dif,&inter,&out);
-
-
+		fermeture3_3(&dif,&inter,&out); // provoc des erreurs de sgmentation
 		writePGM(&out,i,"FD_Morpho3_3/FD_Morpho3_3_car_");
 	}
-	printf("Fin FD morpho 3_3\n");
+	//printf("Fin FD morpho 3_3\n");
 }
 
 void FD_Full_Step_Morpho5_5()
 {
-	printf("Demarage FD morpho 5_5\n");
+	//printf("Demarage FD morpho 5_5\n");
 	image_t ImgRead;
 	image_t ImgRead1;
 	image_t dif, out,inter;
@@ -282,7 +285,7 @@ void FD_Full_Step_Morpho5_5()
 
 		writePGM(&out,i,"FD_Morpho5_5/FD_Morpho5_5_car_");
 	}
-	printf("Fin FD morpho 5_5\n");
+	//printf("Fin FD morpho 5_5\n");
 }
 
 void SD_1_step(image_t* ImgRead, image_t* Ot, image_t* Vt, image_t* Mt)
@@ -320,7 +323,7 @@ void SD_1_step(image_t* ImgRead, image_t* Ot, image_t* Vt, image_t* Mt)
 
 void SD_Full_Step_NO_Morpho()
 {
-        printf("Démarage SD sans Morpho\n");
+        //printf("Démarage SD sans Morpho\n");
         image_t ImgRead, Ot, Mt, Vt;
         int k;
         char nomFichier[50];
@@ -343,12 +346,12 @@ void SD_Full_Step_NO_Morpho()
 
                 writePGM(&Ot,k,"SD/SDcar_");
         }
-        printf("FIN SD sans Morpho\n");
+        //printf("FIN SD sans Morpho\n");
 }
 
 void SD_Full_Step_Morpho3_3()
 {
-        printf("Démarage SD Morpho 3_3\n");
+        //printf("Démarage SD Morpho 3_3\n");
         image_t ImgRead, Ot, Mt, Vt,inter,out;
         int k;
         char nomFichier[50];
@@ -381,12 +384,12 @@ void SD_Full_Step_Morpho3_3()
 
                 writePGM(&Ot,k,"SD_Morpho3_3/SDcar3_3_");
         }
-        printf("FIN SD Morpho 3_3\n");
+        //printf("FIN SD Morpho 3_3\n");
 }
 
 void SD_Full_Step_Morpho5_5()
 {
-        printf("Démarage SD Morpho 5_5\n");
+       // printf("Démarage SD Morpho 5_5\n");
         image_t ImgRead, Ot, Mt, Vt,inter,out;
         int k;
         char nomFichier[50];
@@ -419,16 +422,80 @@ void SD_Full_Step_Morpho5_5()
 
                 writePGM(&Ot,k,"SD_Morpho5_5/SDcar5_5_");
         }
-        printf("FIN SD Morpho 5_5\n");
+      //  printf("FIN SD Morpho 5_5\n");
 }
 
 
 int main()
 {
-double t0,t1;
-int i;
-double freq ;
-LitFrequenceCpu(&freq);
+int i,j;
+image_t Image;
+readPGM("car3/car_3000.pgm",&Image);
+
+image_SEE ImageSEE;
+ /*vfloat32 **vX1;
+
+  int card;
+  int si0, si1; // scalar indices
+    int vi0, vi1; // vector indices
+    int mi0, mi1; // memory (bounded) indices
+
+
+
+ card = card_vfloat32();
+
+ 	si0 = 0;
+    si1 = Image.h -1;
+    s2v1D(si0, si1, card, &vi0, &vi1);
+    v2m1D(vi0, vi1, card, &mi0, &mi1);
+
+    vX1 = vf32vectorArray(mi0, mi1);
+
+    si0 = 0;
+    si1 = Image.w -1;
+    s2v1D(si0, si1, card, &vi0, &vi1);
+    v2m1D(vi0, vi1, card, &mi0, &mi1);
+
+    for(i=0;i<Image.h;i++)
+    {
+    	vX1[i] = vf32vector(vi0, vi1);
+    }*/
+
+initImageSEE(&ImageSEE,Image.w, Image.h, Image.maxInt);
+copyImage_t_to_Image_SEE(&Image, &ImageSEE);
+copyImage_SEE_to_Image_t(&ImageSEE,&Image);
+writePGM(&Image,1,"car");
+writePGM(&Image,2,"car");
+   
+
+  //display_f32vector((float32*) Image.data[0], si0, si1, "%4.0f", "sX1");
+
+    /// affichage par bloc SIMD: appel de la fonction SIMD
+   // display_vf32vector( Image.data[0], vi0, vi1, "%4.0f", "vX1"); puts("");
+
+//display_vf32vector( ImageSEE.data[58], 0, 10, "%4.0f", "vX1"); puts("");
+
+
+ //	display_vfloat32(*vX1, "%6.0f ", "sX1"); puts("");
+
+
+
+
+
+//free_vf32vector(vX1[0], vi0, vi1);
+
+
+
+
+
+
+
+
+
+
+
+
+
 //FD_Full_Step_NO_Morpho();
 
 //FD_Full_Step_Morpho3_3();
@@ -440,23 +507,16 @@ LitFrequenceCpu(&freq);
 //SD_Full_Step_Morpho3_3();
 
 //SD_Full_Step_Morpho5_5();
+
+  //main_Bench_FD();
+  
+  //main_Bench_SD();
 	
- 	/*t0= rdtsc();
-	printf("il faut %f cycles\n",t0);
+//chrono(FD_Full_Step_NO_Morpho);
 
-	for(i=0;i<NRUN;i++)
-	{
-		FD_Full_Step_Morpho3_3();
-	}
+//chrono(SD_Full_Step_NO_Morpho);
 
-    t1= rdtsc();
-	printf("il faut %f cycles\n",t1);
+//chrono(FD_Full_Step_Morpho3_3);
 
-	printf(" total = %f \n",(t1-t0)/(NRUN*freq));*/
-chrono(FD_Full_Step_NO_Morpho);
-	
-	//free_imatrix();
-
-	
 	return 0;
 }
