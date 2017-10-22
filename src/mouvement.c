@@ -118,8 +118,15 @@ void FD_1_Step(image_t* ImgRead1, image_t* ImgRead, image_t* dif)
 	{
 		for(j=0;j<dif->w;j++)
 		{
-			dif->data[i][j] = ImgRead1->data[i][j] - ImgRead->data[i][j];
+			dif->data[i][j] = fabs(ImgRead1->data[i][j] - ImgRead->data[i][j]);
 		
+
+		}
+	}
+	for(i=0;i<dif->h;i++)
+	{
+		for(j=0;j<dif->w;j++)
+		{
 			if(dif->data[i][j] < TETA )
 				dif->data[i][j] = 0;
 			else
@@ -175,7 +182,7 @@ void writePGM(image_t* dif, int k, char* dossier)
 				fprintf(fp,"%c",dif->data[i][j]);
 			}
 		}	
-		//fclose(fp);
+		fclose(fp);
 	}
 	
 
@@ -303,6 +310,13 @@ void SD_1_step(image_t* ImgRead, image_t* Ot, image_t* Vt, image_t* Mt)
                                 Mt->data[i][j] = Mt->data[i][j] -1;
 
                         Ot->data[i][j] = fabs(Mt->data[i][j] - ImgRead->data[i][j]);
+                    }
+                }
+         for(i=0;i<ImgRead->h;i++)
+        {
+                for(j=0;j<ImgRead->w;j++)
+                {
+
 
                 if(Vt->data[i][j] < N * Ot->data[i][j])
                 	 Vt->data[i][j] = Vt->data[i][j] +1;
@@ -312,6 +326,12 @@ void SD_1_step(image_t* ImgRead, image_t* Ot, image_t* Vt, image_t* Mt)
                         Vt->data[i][j] = Vt->data[i][j];
 
                 Vt->data[i][j] = MAX(MIN(Vt->data[i][j],VMAX),VMIN);
+            }
+        }
+        for(i=0;i<ImgRead->h;i++)
+        {
+                for(j=0;j<ImgRead->w;j++)
+                {
 
                 if(Ot->data[i][j]< Vt->data[i][j])
                         Ot->data[i][j] = 0;
@@ -430,7 +450,6 @@ void SD_Full_Step_Morpho5_5()
 int main()
 {
 
-
 //FD_Full_Step_NO_Morpho();
 
 //FD_Full_Step_Morpho3_3();
@@ -448,9 +467,8 @@ int main()
   //main_Bench_SD();
 
 
-	FD_Full_Step_NO_Morpho_SEE();
 	//FD_Full_Step_NO_Morpho_SEE();
-	
+
 //chrono(FD_Full_Step_NO_Morpho);
 
 //chrono(SD_Full_Step_NO_Morpho);
@@ -458,6 +476,7 @@ int main()
 //chrono(FD_Full_Step_Morpho3_3);
 	
 	//chrono(FD_Full_Step_NO_Morpho_SEE);
+	
 
 	return 0;
 }

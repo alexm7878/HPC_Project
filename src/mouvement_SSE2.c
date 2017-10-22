@@ -34,6 +34,75 @@ void initImageSEE(image_SEE* Image, int w, int h,int intensity)
     }
 }
 
+int readPGM_SEE(char* NomFichier, image_SEE* ImgRead)
+{
+	FILE* fp;
+	char motMagique[3]="";
+	char chaine[1000] = "";
+	int w,h,intensity;
+	int i,j,k;
+	char tabLect[16]="";
+	vuint8 x;
+
+	fp=fopen(NomFichier,"r");
+	if(fp != NULL)
+	{
+			// Lecture du mot permettant de reconnaitre le PGM 
+			fgets(chaine, 1000, fp);
+			strncpy(motMagique,chaine,2);
+		
+			if(strcmp(motMagique,"P5") !=0)
+			{
+				printf("Ce n'est pas un fichier PGM\n");
+				return -1;
+			}
+
+			//Suppression des lignes de commentaires
+			fgets(chaine, 1000, fp);
+			while(chaine[0] == '#')
+			{
+				fgets(chaine, 1000, fp);
+			}
+
+			fseek(fp, -(int)strlen(chaine), SEEK_CUR); // Retour en arrière car il y a eu saut de ligne dans le while
+			fscanf(fp,"%d %d \n",&w,&h); // Récupération de Width hight 
+			fscanf(fp,"%d \n",&intensity); // Récupération de intensity 
+
+
+			//initialisation de l'image
+			initImageSEE(ImgRead,w,h,intensity);
+
+			//Lecture de chacune des valeurs 
+			for(i=0;i<ImgRead->h;i++)
+			{
+				for(j=0;j<ImgRead->w;j+=16)
+				{
+					/*for(k=0;k<16;k++){
+						tabLect[k] = fgetc(fp);
+						
+					}*/
+					
+					x =_mm_set_epi8(fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),
+							fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),
+							fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp));
+					_mm_store_si128(&ImgRead->data[i][j/16],x);
+
+				}
+			}
+
+			fclose(fp);
+
+			return 0;
+		}
+	else
+	{
+			//printf("Fichier impossible à ouvrir\n");
+			return -1;
+	}
+	
+	return -1;
+}
+
 void copyImage_t_to_Image_SEE(image_t* imaget, image_SEE* imageSEE)
 {
 	int i,j,k;
@@ -76,10 +145,12 @@ void FD_1_Step_SEE(image_SEE* ImageSEE1, image_SEE* ImageSEE2, image_SEE* dif)
 	int i,j;
 	int c =card_vuint8();
 
-	vuint8 x,y,z ,zero, valMax,teta ,cmp;
+	vuint8  x,y,z, zero, valMax,teta ,cmp,neg,un;
  	zero =_mm_set1_epi8(0);
  	valMax = _mm_set1_epi8(255);
 	teta = _mm_set1_epi8(TETA);
+	neg = _mm_set1_epi8(-1);
+	un =_mm_set1_epi8(1);
 
 	for(i=0;i<ImageSEE1->h;i++)
 	{
@@ -87,15 +158,14 @@ void FD_1_Step_SEE(image_SEE* ImageSEE1, image_SEE* ImageSEE2, image_SEE* dif)
 			{
 			x = _mm_load_si128(&ImageSEE2->data[i][j]);
 			y = _mm_load_si128(&ImageSEE1->data[i][j]);
-			z =_mm_subs_epu8(x,y);
+			z = _mm_subs_epu8(x,y);
+			
 
-			//display_vuint8(x, "%d ", "x "); puts("");
-			//display_vuint8(y, "%d ", "y "); puts("");
-			//display_vuint8(z, "%d ", "z "); puts("");
+			//display_vuint8(z, "%d ", "z2 "); puts("");
+
 			cmp =_mm_cmplt_epi8(z ,teta);
 			x =_mm_or_si128(_mm_and_si128(cmp,zero),_mm_andnot_si128(cmp,valMax));
 
-			//display_vuint8(x, "%d ", "x "); puts("");
 			_mm_store_si128(&dif->data[i][j],x);
 		}
 	}
@@ -113,31 +183,82 @@ void FD_Full_Step_NO_Morpho_SEE()
 
 	image_SEE ImageSEE1,ImageSEE2, dif;
 
-	readPGM("car3/car_3000.pgm",&ImgRead);
+	readPGM_SEE("car3/car_3000.pgm",&ImageSEE1);
+	//readPGM("car3/car_3000.pgm",&ImgRead);
 
-	initImageSEE(&ImageSEE1,ImgRead.w,ImgRead.h,ImgRead.maxInt);
-	initImageSEE(&ImageSEE2,ImgRead.w,ImgRead.h,ImgRead.maxInt);
-	initImageSEE(&dif,ImgRead.w,ImgRead.h,ImgRead.maxInt);
-
-
+ 	//initImageSEE(&ImageSEE1,ImgRead.w,ImgRead.h,ImgRead.maxInt);
+	initImageSEE(&ImageSEE2,ImageSEE1.w,ImageSEE1.h,ImageSEE1.maxInt);
+	initImageSEE(&dif,ImageSEE1.w,ImageSEE1.h,ImageSEE1.maxInt);
 
 	for(i=0;i<199;i++){
 		Conc("car3/car_",3000+i,nomFichier);
 		Conc("car3/car_",3000+i+1,nomFichier2);
 
-		readPGM(nomFichier,&ImgRead);
+		readPGM_SEE(nomFichier,&ImageSEE1);
 			//printf("L'image a bien été lu\n ");
-		readPGM(nomFichier2,&ImgRead1);
+		readPGM_SEE(nomFichier2,&ImageSEE2);
 			//printf("L'image a bien été lu\n ");
-
-		copyImage_t_to_Image_SEE(&ImgRead, &ImageSEE1);
-		copyImage_t_to_Image_SEE(&ImgRead1, &ImageSEE2);
 
 		FD_1_Step_SEE(&ImageSEE1,&ImageSEE2,&dif);
 
-		copyImage_SEE_to_Image_t(&dif,&ImgRead);
-		writePGM(&ImgRead,i,"FDSEE/FDcar_");
+		//copyImage_SEE_to_Image_t(&dif,&ImgRead);
+		//writePGM(&ImgRead,i,"FDSEE/FDSEEcar_");
+		writePGM_SEE(&dif,i,"FDSEE/FDSEEcar_");
 	}
+
 	//printf("Fin FD sans morpho\n");
 	//freeImage_t(&ImgRead);
+	//freeImageSEE(&ImageSEE1);
+	//freeImageSEE(&ImageSEE2);
+	//freeImageSEE(&dif);
+
+}
+
+
+void writePGM_SEE(image_SEE* dif, int k, char* dossier)
+{
+
+	FILE* fp;
+	int i,j;
+	char nomFichier[50] = "";
+
+	Conc(dossier,k,nomFichier);
+	vuint8  x;
+
+	fp = fopen(nomFichier,"w");
+	if(fp!=NULL)
+	{
+		fprintf(fp,"P5\n");
+		fprintf(fp,"%d %d\n",dif->w,dif->h);
+		fprintf(fp,"%d\n",dif->maxInt);
+
+		for(i=0;i<dif->h;i++)
+		{
+			for(j=0;j<dif->w/16;j++)
+			{
+				//x = _mm_load_si128(&dif->data[i][j]);
+				 fwrite(&(dif->data[i][j]), sizeof(vuint8), 1, fp);
+				
+				//fprintf(fp,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",(char)x[0],(char)x[1],(char)x[2],(char)x[3],(char)x[4],
+				//	(char)x[5],(char)x[6],(char)x[7],(char)x[8],(char)x[9],
+				//	(char)x[10],(char)x[11],(char)x[12],(char)x[13],(char)x[14],(char)x[15]);
+			}
+		}	
+		//fclose(fp);
+	}
+	
+
+}
+
+void freeImageSEE(image_SEE* image)
+{
+
+	int i,j;
+
+	for(i=0;i<image->h;i++)
+	{
+		free_vui8vector(image->data[i], 0, 19);
+	}
+
+	free_vui8vector(image->data, 0, 239);
 }
