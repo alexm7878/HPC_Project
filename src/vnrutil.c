@@ -130,6 +130,18 @@ vuint8* vui8vector(int nl, int nh)
     if(!v) return NULL;
     return v-nl;
 }
+vuint8** vui8vectorArray(int nl, int nh)
+/* ------------------------------ */
+{
+    vuint8 **v;
+    
+    v=(vuint8**)_mm_malloc ((size_t) ((nh-nl+1)*sizeof(vuint8*)), 16);
+    if (!v) vnrerror("allocation failure in vf32vector()");
+    if(!v) return NULL;
+    v -= nl;
+    //return v-nl;
+    return v;
+}
 /* ---------------------------- */
 vsint8* vsi8vector(int nl, int nh)
 /* ---------------------------- */
@@ -210,18 +222,7 @@ vfloat32* vf32vector(int nl, int nh)
     return v;
 }
 
-vfloat32** vf32vectorArray(int nl, int nh)
-/* ------------------------------ */
-{
-    vfloat32 **v;
-    
-    v=(vfloat32**)_mm_malloc ((size_t) ((nh-nl+1)*sizeof(vfloat32*)), 16);
-    if (!v) vnrerror("allocation failure in vf32vector()");
-    if(!v) return NULL;
-    v -= nl;
-    //return v-nl;
-    return v;
-}
+
 /* ----------------------------------------- */
 void free_vui8vector(vuint8 *v, int nl, int nh)
 /* ----------------------------------------- */

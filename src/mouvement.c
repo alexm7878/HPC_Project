@@ -1,7 +1,8 @@
 #include "mouvement.h"
+#include "mouvement_SSE2.h"
 #include "morpho.h"
 #include "benchmark.h"
-#include "mouvement_SSE2.h"
+
 #include "nrdef.h"
 #include "vnrdef.h"
 #include "nrutil.h"
@@ -117,7 +118,7 @@ void FD_1_Step(image_t* ImgRead1, image_t* ImgRead, image_t* dif)
 	{
 		for(j=0;j<dif->w;j++)
 		{
-			dif->data[i][j] = fabs(ImgRead1->data[i][j] - ImgRead->data[i][j]);
+			dif->data[i][j] = ImgRead1->data[i][j] - ImgRead->data[i][j];
 		
 			if(dif->data[i][j] < TETA )
 				dif->data[i][j] = 0;
@@ -428,72 +429,6 @@ void SD_Full_Step_Morpho5_5()
 
 int main()
 {
-int i,j;
-image_t Image;
-readPGM("car3/car_3000.pgm",&Image);
-
-image_SEE ImageSEE;
- /*vfloat32 **vX1;
-
-  int card;
-  int si0, si1; // scalar indices
-    int vi0, vi1; // vector indices
-    int mi0, mi1; // memory (bounded) indices
-
-
-
- card = card_vfloat32();
-
- 	si0 = 0;
-    si1 = Image.h -1;
-    s2v1D(si0, si1, card, &vi0, &vi1);
-    v2m1D(vi0, vi1, card, &mi0, &mi1);
-
-    vX1 = vf32vectorArray(mi0, mi1);
-
-    si0 = 0;
-    si1 = Image.w -1;
-    s2v1D(si0, si1, card, &vi0, &vi1);
-    v2m1D(vi0, vi1, card, &mi0, &mi1);
-
-    for(i=0;i<Image.h;i++)
-    {
-    	vX1[i] = vf32vector(vi0, vi1);
-    }*/
-
-initImageSEE(&ImageSEE,Image.w, Image.h, Image.maxInt);
-copyImage_t_to_Image_SEE(&Image, &ImageSEE);
-copyImage_SEE_to_Image_t(&ImageSEE,&Image);
-writePGM(&Image,1,"car");
-writePGM(&Image,2,"car");
-   
-
-  //display_f32vector((float32*) Image.data[0], si0, si1, "%4.0f", "sX1");
-
-    /// affichage par bloc SIMD: appel de la fonction SIMD
-   // display_vf32vector( Image.data[0], vi0, vi1, "%4.0f", "vX1"); puts("");
-
-//display_vf32vector( ImageSEE.data[58], 0, 10, "%4.0f", "vX1"); puts("");
-
-
- //	display_vfloat32(*vX1, "%6.0f ", "sX1"); puts("");
-
-
-
-
-
-//free_vf32vector(vX1[0], vi0, vi1);
-
-
-
-
-
-
-
-
-
-
-
 
 
 //FD_Full_Step_NO_Morpho();
@@ -511,12 +446,18 @@ writePGM(&Image,2,"car");
   //main_Bench_FD();
   
   //main_Bench_SD();
+
+
+	FD_Full_Step_NO_Morpho_SEE();
+	//FD_Full_Step_NO_Morpho_SEE();
 	
 //chrono(FD_Full_Step_NO_Morpho);
 
 //chrono(SD_Full_Step_NO_Morpho);
 
 //chrono(FD_Full_Step_Morpho3_3);
+	
+	//chrono(FD_Full_Step_NO_Morpho_SEE);
 
 	return 0;
 }
