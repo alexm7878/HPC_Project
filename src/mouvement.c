@@ -2,6 +2,7 @@
 #include "mouvement_SSE2.h"
 #include "morpho.h"
 #include "benchmark.h"
+#include "ppm2pgm.h"
 
 #include "nrdef.h"
 #include "vnrdef.h"
@@ -144,6 +145,14 @@ void Conc(char* nom,int i,char* ret)
 	strcat(ret,a);
 	strcat(ret,".pgm");
 }
+void ConcPPM(char* nom,int i,char* ret)
+{
+	char a[10];
+	strcpy(ret,nom);
+	sprintf(a,"%d",i);
+	strcat(ret,a);
+	strcat(ret,".ppm");
+}
 
 void cpy_Image(image_t* Mt, image_t* ImgRead)//********************* AJOUT
 {
@@ -179,6 +188,38 @@ void writePGM(image_t* dif, int k, char* dossier)
 		{
 			for(j=0;j<dif->w;j++)
 			{
+				fprintf(fp,"%c",dif->data[i][j]);
+			}
+		}	
+		fclose(fp);
+	}
+	
+
+}
+
+void writePPM(image_t* dif, int k, char* dossier)
+{
+
+	FILE* fp;
+	int i,j;
+	char nomFichier[50] = "";
+
+	Conc(dossier,k,nomFichier);
+	printf("%s\n",nomFichier);
+
+	fp = fopen(nomFichier,"w");
+	if(fp!=NULL)
+	{
+		fprintf(fp,"P6\n");
+		fprintf(fp,"%d %d\n",dif->w,dif->h);
+		fprintf(fp,"%d\n",dif->maxInt);
+
+		for(i=0;i<dif->h;i++)
+		{
+			for(j=0;j<dif->w;j++)
+			{
+				fprintf(fp,"%c",dif->data[i][j]);
+				fprintf(fp,"%c",dif->data[i][j]);
 				fprintf(fp,"%c",dif->data[i][j]);
 			}
 		}	
@@ -388,8 +429,9 @@ void SD_Full_Step_Morpho3_3()
 
         cpy_Image(&Vt,&Mt);
 
-        for(k=0;k<199;k++){
+        for(k=0;k<200;k++){
                 Conc("car3/car_",3000+k,nomFichier);
+
 
                 readPGM(nomFichier,&ImgRead);
                 SD_1_step(&ImgRead, &Ot, &Vt, &Mt);
@@ -450,6 +492,16 @@ void SD_Full_Step_Morpho5_5()
 int main()
 {
 
+SD_Full_Step_NO_Morpho_SEE();
+
+	  // green_thresold("PPMVert/car_100.ppm");
+/*int MROC[2][2]={0,0,0,0};
+image_t image,verite;
+
+readPGM("FD/FDcar_99.pgm",&image);
+readPGM("car_100.pgm",&verite);
+	roc(&image,&verite,MROC);
+	displayROC(MROC);*/
 //FD_Full_Step_NO_Morpho();
 
 //FD_Full_Step_Morpho3_3();

@@ -1,5 +1,6 @@
 #include "benchmark.h"
 
+
  __inline__ uint64_t rdtsc(void)
    {
 uint32_t lo, hi;
@@ -111,7 +112,7 @@ void main_Bench_SD()
 }
 
 
-void roc(image_t* Image, image_t* IVT, int** Mroc)
+void roc(image_t* Image, image_t* IVT, int Mroc[2][2])
 {
   int i,j;
 
@@ -119,7 +120,7 @@ void roc(image_t* Image, image_t* IVT, int** Mroc)
   {
     for(j=0;j<Image->w;j++)
     {
-      if(Image->data[i][j] == 0)
+      if(IVT->data[i][j] == 0)
       {
         if(Image->data[i][j] == 0)
           Mroc[1][1] +=1;
@@ -136,7 +137,7 @@ void roc(image_t* Image, image_t* IVT, int** Mroc)
   }
 }
 
-void displayROC(int ** Mroc)
+void displayROC(int Mroc[2][2])
 {
   printf(" VP = %d\t FN = %d\n FP = %d\t VN =%d\n",Mroc[0][0],Mroc[0][1],Mroc[1][0],Mroc[1][1]);
 }

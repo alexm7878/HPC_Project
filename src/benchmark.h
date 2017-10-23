@@ -12,7 +12,7 @@
 	void main_Bench_FD();
 	void main_Bench_SD();
 
-	void roc(image_t* Image, image_t* IVT,int** Mroc);
-	void displayROC(int ** Mroc);
+	void roc(image_t* Image, image_t* IVT,int Mroc[2][2]);
+	void displayROC(int Mroc[2][2]);
 
 #endif

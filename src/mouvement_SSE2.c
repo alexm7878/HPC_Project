@@ -214,6 +214,67 @@ void FD_Full_Step_NO_Morpho_SEE()
 
 }
 
+void cpySEE(image_SEE* in, image_SEE* out)
+{
+
+	int i,j;
+	for(i=0;i<in->h;i++)
+	{
+		for(j=0;j<in->w/16;j++)
+		{
+			_mm_store_si128(&out->data[i][j],in->data[i][j]);
+		}
+	}
+}
+
+
+void SD_1_Step_SEE(image_SEE* ImgRead, image_SEE* Ot, image_SEE* Vt, image_SEE* Mt) // manque la condition ==  dans le premier et deuxieme if
+{
+	int i,j;
+	int c =card_vuint8();
+
+	vuint8  x,y,z,zn, a, zero, valMax,teta ,cmp,neg,un,n,vmax,vmin;
+ 	zero =_mm_set1_epi8(0);
+ 	valMax = _mm_set1_epi8(255);
+	n = _mm_set1_epi8(N);
+	vmax = _mm_set1_epi8(VMAX);
+	vmin = _mm_set1_epi8(VMIN);
+	neg = _mm_set1_epi8(-1);
+	un =_mm_set1_epi8(1);
+
+	for(i=0;i<ImgRead->h;i++)
+	{
+		for(j=0;j<ImgRead->w/c;j++)
+			{
+			x = _mm_load_si128(&ImgRead->data[i][j]);
+			y = _mm_load_si128(&Mt->data[i][j]);
+			a = _mm_load_si128(&Vt->data[i][j]);
+			
+			cmp =_mm_cmplt_epi8(y ,x);
+			x =_mm_or_si128(_mm_and_si128(cmp,un),_mm_andnot_si128(cmp,neg));
+			y = _mm_add_epi8(x,y);
+
+			z = _mm_subs_epu8(y,x);
+
+			zn = _mm_mul_epu32(z,n);
+
+			cmp =_mm_cmplt_epi8(a ,zn);
+			x =_mm_or_si128(_mm_and_si128(cmp,un),_mm_andnot_si128(cmp,neg));
+			a = _mm_add_epi8(a,x);
+
+			a = _mm_max_epu8(_mm_min_epu8(a,vmax),vmin);
+
+			cmp =_mm_cmplt_epi8(z ,a);
+			x =_mm_or_si128(_mm_and_si128(cmp,zero),_mm_andnot_si128(cmp,valMax));
+
+			_mm_store_si128(&Ot->data[i][j],x);
+
+		}
+	}
+}
+
+
+
 
 void writePGM_SEE(image_SEE* dif, int k, char* dossier)
 {
@@ -247,6 +308,49 @@ void writePGM_SEE(image_SEE* dif, int k, char* dossier)
 		//fclose(fp);
 	}
 	
+}
+
+void SD_Full_Step_NO_Morpho_SEE()
+{
+	//printf("Demarage FD sans morpho\n");
+	image_t ImgRead;
+	image_t ImgRead1;
+	int i;
+	char nomFichier[50] ="";
+	char nomFichier2[50] ="";
+
+	image_SEE ImageSEE1, Ot, Vt,  Mt;
+
+	readPGM_SEE("car3/car_3000.pgm",&ImageSEE1);
+	readPGM_SEE("car3/car_3001.pgm",&Mt);
+	
+
+
+	//initImageSEE(&ImageSEE2,ImageSEE1.w,ImageSEE1.h,ImageSEE1.maxInt);
+	initImageSEE(&Vt,ImageSEE1.w,ImageSEE1.h,ImageSEE1.maxInt);
+	initImageSEE(&Ot,ImageSEE1.w,ImageSEE1.h,ImageSEE1.maxInt);
+
+	for(i=0;i<199;i++){
+		Conc("car3/car_",3000+i,nomFichier);
+		//Conc("car3/car_",3000+i+1,nomFichier2);
+
+		readPGM_SEE(nomFichier,&ImageSEE1);
+			//printf("L'image a bien été lu\n ");
+		//readPGM_SEE(nomFichier2,&ImageSEE2);
+			//printf("L'image a bien été lu\n ");
+
+		SD_1_Step_SEE(&ImageSEE1, &Ot, &Vt,&Mt);
+
+		//copyImage_SEE_to_Image_t(&dif,&ImgRead);
+		//writePGM(&ImgRead,i,"FDSEE/FDSEEcar_");
+		writePGM_SEE(&Ot,i,"SDSEE/SDSEEcar_");
+	}
+
+	//printf("Fin FD sans morpho\n");
+	//freeImage_t(&ImgRead);
+	//freeImageSEE(&ImageSEE1);
+	//freeImageSEE(&ImageSEE2);
+	//freeImageSEE(&dif);
 
 }
 

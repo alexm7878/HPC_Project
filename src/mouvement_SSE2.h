@@ -18,6 +18,8 @@
 
 	void FD_1_Step_SEE(image_SEE* ImageSEE1, image_SEE* ImageSEE2, image_SEE* dif);
 	void FD_Full_Step_NO_Morpho_SEE();
+	void SD_1_Step_SEE(image_SEE* ImgRead, image_SEE* Ot, image_SEE* Vt, image_SEE* Mt);
+	void SD_Full_Step_NO_Morpho_SEE();
 
 	void freeImageSEE(image_SEE* image);
 
