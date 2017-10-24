@@ -230,47 +230,55 @@ void cpySEE(image_SEE* in, image_SEE* out)
 
 void SD_1_Step_SEE(image_SEE* ImgRead, image_SEE* Ot, image_SEE* Vt, image_SEE* Mt) // manque la condition ==  dans le premier et deuxieme if
 {
+
 	int i,j;
 	int c =card_vuint8();
+	vuint8  mt,img_read,vt,	sl,sg,ot, a,b;
 
-	vuint8  x,y,z,zn, a, zero, valMax,teta ,cmp,neg,un,n,vmax,vmin;
- 	zero =_mm_set1_epi8(0);
- 	valMax = _mm_set1_epi8(255);
-	n = _mm_set1_epi8(N);
-	vmax = _mm_set1_epi8(VMAX);
-	vmin = _mm_set1_epi8(VMIN);
-	neg = _mm_set1_epi8(-1);
-	un =_mm_set1_epi8(1);
+ 	vuint8 zero =_mm_set1_epi8(0);
+ 	vuint8 valMax = _mm_set1_epi8(255);
+ 	vuint8 n = _mm_set1_epi8(N);
+ 	vuint8 vmax = _mm_set1_epi8(VMAX);
+	vuint8 vmin = _mm_set1_epi8(VMIN);
 
-	for(i=0;i<ImgRead->h;i++)
-	{
-		for(j=0;j<ImgRead->w/c;j++)
-			{
-			x = _mm_load_si128(&ImgRead->data[i][j]);
-			y = _mm_load_si128(&Mt->data[i][j]);
-			a = _mm_load_si128(&Vt->data[i][j]);
-			
-			cmp =_mm_cmplt_epi8(y ,x);
-			x =_mm_or_si128(_mm_and_si128(cmp,un),_mm_andnot_si128(cmp,neg));
-			y = _mm_add_epi8(x,y);
+	for(i=0;i<ImgRead->h;i++){
+    	for(j=0;j<ImgRead->w/c;j++){
 
-			z = _mm_subs_epu8(y,x);
+    	   // INIT
+        	mt = _mm_load_si128(&Mt->data[i][j]);
+            vt = _mm_load_si128(&Vt->data[i][j]);
+            ot = _mm_load_si128(&Ot->data[i][j]);
+            img_read = _mm_load_si128(&ImgRead->data[i][j]);
 
-			zn = _mm_mul_epu32(z,n);
+           // STEP 1
+            sl = _mm_cmplt_epi8(mt, img_read);	// 0xFF si a < b ; 0 si a > b
+            sg = _mm_cmpgt_epi8(mt, img_read);	// 0 si a < b; 0xFF si a > b
 
-			cmp =_mm_cmplt_epi8(a ,zn);
-			x =_mm_or_si128(_mm_and_si128(cmp,un),_mm_andnot_si128(cmp,neg));
-			a = _mm_add_epi8(a,x);
+            mt = _mm_add_epi8(mt, _mm_or_si128(_mm_and_si128(sl,valMax), zero)); 	// mt ADD ( (Sl ET 255) OR 0 ) 
+            mt = _mm_sub_epi8(mt, _mm_or_si128(_mm_and_si128(sg,valMax), zero));	// mt SUB ( (Sl ET 255) OR 0 ) 
 
-			a = _mm_max_epu8(_mm_min_epu8(a,vmax),vmin);
+           // STEP 2 // abs
+           	a = _mm_max_epu8(mt, img_read);
+           	b = _mm_min_epu8(mt, img_read);
 
-			cmp =_mm_cmplt_epi8(z ,a);
-			x =_mm_or_si128(_mm_and_si128(cmp,zero),_mm_andnot_si128(cmp,valMax));
+            ot = _mm_sub_epi8(a, b);
 
-			_mm_store_si128(&Ot->data[i][j],x);
+           // STEP 3 
+            sl = _mm_cmplt_epi8(vt, _mm_mul_epu32(n,ot));	// 0xFF si a < b ; 0 si a > b
+            sg = _mm_cmpgt_epi8(vt, _mm_mul_epu32(n,ot));	// 0 si a < b; 0xFF si a > b
 
-		}
-	}
+            vt = _mm_add_epi8(vt, _mm_or_si128(_mm_and_si128(sl,valMax), zero)); 	// mt ADD ( (Sl ET 255) OR 0 ) 
+            vt = _mm_sub_epi8(vt, _mm_or_si128(_mm_and_si128(sg,valMax), zero));	// mt SUB ( (Sl ET 255) OR 0 ) 
+
+            vt = _mm_max_epu8(_mm_min_epu8(vt,vmax), vmin);
+
+           // STEP 4 
+            sl = _mm_cmplt_epi8(ot,vt);
+            ot = _mm_or_si128(_mm_andnot_si128(sl,valMax), zero);
+
+            _mm_store_si128(&Ot->data[i][j],ot);
+        }
+    }
 }
 
 
