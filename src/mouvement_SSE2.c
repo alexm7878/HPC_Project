@@ -20,14 +20,14 @@ void initImageSEE(image_SEE* Image, int w, int h,int intensity)
     s2v1D(si0, si1, card, &vi0, &vi1);
     v2m1D(vi0, vi1, card, &mi0, &mi1);*/
 
-    Image->data = vui8vectorArray(0, Image->h-1);
+    Image->data = vui8vectorArray(-2, Image->h+1);
 
-    si0 = 0;
-    si1 = Image->w-1;
+    si0 = -2;
+    si1 = Image->w+1;
     s2v1D(si0, si1, card, &vi0, &vi1);
     v2m1D(vi0, vi1, card, &mi0, &mi1);
 
-    for(i=0;i<Image->h;i++)
+    for(i=-2;i<Image->h+2;i++)
     {
     	Image->data[i] = vui8vector(vi0, vi1);
 
@@ -204,6 +204,49 @@ void FD_Full_Step_NO_Morpho_SEE()
 		//copyImage_SEE_to_Image_t(&dif,&ImgRead);
 		//writePGM(&ImgRead,i,"FDSEE/FDSEEcar_");
 		writePGM_SEE(&dif,i,"FDSEE/FDSEEcar_");
+	}
+
+	//printf("Fin FD sans morpho\n");
+	//freeImage_t(&ImgRead);
+	//freeImageSEE(&ImageSEE1);
+	//freeImageSEE(&ImageSEE2);
+	//freeImageSEE(&dif);
+
+}
+
+void FD_Full_Step_Morpho3_3_SEE()
+{
+	//printf("Demarage FD sans morpho\n");
+	image_t ImgRead;
+	image_t ImgRead1;
+	int i;
+	char nomFichier[50] ="";
+	char nomFichier2[50] ="";
+
+	image_SEE ImageSEE1,ImageSEE2, dif,out;
+
+	readPGM_SEE("car3/car_3000.pgm",&ImageSEE1);
+	//readPGM("car3/car_3000.pgm",&ImgRead);
+
+ 	initImageSEE(&out,ImageSEE1.w,ImageSEE1.h,ImageSEE1.maxInt);
+	initImageSEE(&ImageSEE2,ImageSEE1.w,ImageSEE1.h,ImageSEE1.maxInt);
+	initImageSEE(&dif,ImageSEE1.w,ImageSEE1.h,ImageSEE1.maxInt);
+
+	for(i=0;i<199;i++){
+		Conc("car3/car_",3000+i,nomFichier);
+		Conc("car3/car_",3000+i+1,nomFichier2);
+
+		readPGM_SEE(nomFichier,&ImageSEE1);
+			//printf("L'image a bien été lu\n ");
+		readPGM_SEE(nomFichier2,&ImageSEE2);
+			//printf("L'image a bien été lu\n ");
+
+		FD_1_Step_SEE(&ImageSEE1,&ImageSEE2,&dif);
+
+		morpho_SEE_Erosion3_3(&dif, &out);
+		//copyImage_SEE_to_Image_t(&dif,&ImgRead);
+		//writePGM(&ImgRead,i,"FDSEE/FDSEEcar_");
+		writePGM_SEE(&out,i,"FDSEE_Morpho3_3/FDSEEcar_");
 	}
 
 	//printf("Fin FD sans morpho\n");
