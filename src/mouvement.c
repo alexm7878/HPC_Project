@@ -493,10 +493,6 @@ int main()
 {
 
 
-
-	 
-
-
 //FD SANS OPTI
 
 //FD_Full_Step_NO_Morpho();

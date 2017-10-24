@@ -1,6 +1,6 @@
 #include "benchmark.h"
 
-
+/*
  __inline__ uint64_t rdtsc(void)
    {
 uint32_t lo, hi;
@@ -10,6 +10,21 @@ __asm__ __volatile__ (
 __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
 return (uint64_t)hi << 32 | lo;
  }
+*/
+
+#ifdef __i386
+extern __inline__ uint64_t rdtsc(void) {
+  uint64_t x;
+  __asm__ volatile ("rdtsc" : "=A" (x));
+  return x;
+}
+#elif defined __amd64
+extern __inline__ uint64_t rdtsc(void) {
+  uint64_t a, d;
+  __asm__ volatile ("rdtsc" : "=a" (a), "=d" (d));
+  return (d<<32) | a;
+}
+#endif
 
 
 // Lit la fréquence du processeur
