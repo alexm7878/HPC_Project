@@ -305,7 +305,7 @@ void writePGM_SEE(image_SEE* dif, int k, char* dossier)
 				//	(char)x[10],(char)x[11],(char)x[12],(char)x[13],(char)x[14],(char)x[15]);
 			}
 		}	
-		//fclose(fp);
+		fclose(fp);
 	}
 	
 }

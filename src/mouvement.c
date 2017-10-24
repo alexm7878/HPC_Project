@@ -429,7 +429,7 @@ void SD_Full_Step_Morpho3_3()
 
         cpy_Image(&Vt,&Mt);
 
-        for(k=0;k<200;k++){
+        for(k=0;k<199;k++){
                 Conc("car3/car_",3000+k,nomFichier);
 
 
@@ -492,21 +492,21 @@ void SD_Full_Step_Morpho5_5()
 int main()
 {
 
-SD_Full_Step_NO_Morpho_SEE();
 
-	  // green_thresold("PPMVert/car_100.ppm");
-/*int MROC[2][2]={0,0,0,0};
-image_t image,verite;
 
-readPGM("FD/FDcar_99.pgm",&image);
-readPGM("car_100.pgm",&verite);
-	roc(&image,&verite,MROC);
-	displayROC(MROC);*/
+	 
+
+
+//FD SANS OPTI
+
 //FD_Full_Step_NO_Morpho();
 
 //FD_Full_Step_Morpho3_3();
 
 //FD_Full_Step_Morpho5_5();
+
+
+//SD SANS OPTI
 
 //SD_Full_Step_NO_Morpho();
 
@@ -514,19 +514,44 @@ readPGM("car_100.pgm",&verite);
 
 //SD_Full_Step_Morpho5_5();
 
+
+//FD_OPTI
+
+//FD_Full_Step_NO_Morpho_SEE();
+
+
+//SD OPTI
+//SD_Full_Step_NO_Morpho_SEE();
+
+
   //main_Bench_FD();
   
   //main_Bench_SD();
 
 
-	//FD_Full_Step_NO_Morpho_SEE();
+// BENCH MARQUE DE CHAQUE FONCTION 
 
 //chrono(FD_Full_Step_NO_Morpho);
 
 //chrono(SD_Full_Step_NO_Morpho);
 
 //chrono(FD_Full_Step_Morpho3_3);
-	
+
+//chrono(FD_Full_Step_Morpho5_5);
+
+
+//chrono(SD_Full_Step_Morpho3_3);
+//chrono(SD_Full_Step_Morpho5_5);
+
+
+chrono(FD_Full_Step_NO_Morpho_SEE);
+int MROC[2][2]={0,0,0,0};
+image_t image,verite;
+
+readPGM("FD_SEE/FDSEEcar_99.pgm",&image);
+readPGM("Verite/car_100.pgm",&verite);
+	roc(&image,&verite,MROC);
+	displayROC(MROC);	
 	//chrono(FD_Full_Step_NO_Morpho_SEE);
 	
 
