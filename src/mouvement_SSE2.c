@@ -81,10 +81,11 @@ int readPGM_SEE(char* NomFichier, image_SEE* ImgRead)
 						tabLect[k] = fgetc(fp);
 						
 					}*/
-					
-					x =_mm_set_epi8(fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),
-							fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),
-							fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp));
+					  fread(&x, sizeof(vuint8), 1, fp);
+					//  fwrite(&(dif->data[i][j]), sizeof(vuint8), 1, fp);
+					//x =_mm_set_epi8(fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),
+						//	fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),
+							//fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp));
 					_mm_store_si128(&ImgRead->data[i][j/16],x);
 
 				}
@@ -142,7 +143,7 @@ void copyImage_SEE_to_Image_t(image_SEE* imageSEE,image_t* imaget)
 
 void FD_1_Step_SEE(image_SEE* ImageSEE1, image_SEE* ImageSEE2, image_SEE* dif)
 {
-	int i,j;
+	int i,j,k,l;
 	int c =card_vuint8();
 
 	vuint8  x,y,z, zero, valMax,teta ,cmp,neg,un;
@@ -159,14 +160,12 @@ void FD_1_Step_SEE(image_SEE* ImageSEE1, image_SEE* ImageSEE2, image_SEE* dif)
 			x = _mm_load_si128(&ImageSEE2->data[i][j]);
 			y = _mm_load_si128(&ImageSEE1->data[i][j]);
 			z = _mm_subs_epu8(x,y);
-			
-
-			//display_vuint8(z, "%d ", "z2 "); puts("");
 
 			cmp =_mm_cmplt_epi8(z ,teta);
 			x =_mm_or_si128(_mm_and_si128(cmp,zero),_mm_andnot_si128(cmp,valMax));
-
+			//display_vuint8(x, "%d ", "x "); puts("");
 			_mm_store_si128(&dif->data[i][j],x);
+			
 		}
 	}
 }
@@ -219,11 +218,11 @@ void FD_Full_Step_Morpho3_3_SEE()
 	//printf("Demarage FD sans morpho\n");
 	image_t ImgRead;
 	image_t ImgRead1;
-	int i;
+	int i,j,k;
 	char nomFichier[50] ="";
 	char nomFichier2[50] ="";
 
-	image_SEE ImageSEE1,ImageSEE2, dif,out;
+	image_SEE ImageSEE1,ImageSEE2, dif,out,inter;
 
 	readPGM_SEE("car3/car_3000.pgm",&ImageSEE1);
 	//readPGM("car3/car_3000.pgm",&ImgRead);
@@ -231,6 +230,7 @@ void FD_Full_Step_Morpho3_3_SEE()
  	initImageSEE(&out,ImageSEE1.w,ImageSEE1.h,ImageSEE1.maxInt);
 	initImageSEE(&ImageSEE2,ImageSEE1.w,ImageSEE1.h,ImageSEE1.maxInt);
 	initImageSEE(&dif,ImageSEE1.w,ImageSEE1.h,ImageSEE1.maxInt);
+	initImageSEE(&inter,ImageSEE1.w,ImageSEE1.h,ImageSEE1.maxInt);
 
 	for(i=0;i<199;i++){
 		Conc("car3/car_",3000+i,nomFichier);
@@ -242,8 +242,10 @@ void FD_Full_Step_Morpho3_3_SEE()
 			//printf("L'image a bien été lu\n ");
 
 		FD_1_Step_SEE(&ImageSEE1,&ImageSEE2,&dif);
+	
 
-		morpho_SEE_Erosion3_3(&dif, &out);
+		morpho_SSE_Dilatation3_3(&dif, &out);
+		//ouverture_SSE3_3(&dif,&inter,&out);
 		//copyImage_SEE_to_Image_t(&dif,&ImgRead);
 		//writePGM(&ImgRead,i,"FDSEE/FDSEEcar_");
 		writePGM_SEE(&out,i,"FDSEE_Morpho3_3/FDSEEcar_");

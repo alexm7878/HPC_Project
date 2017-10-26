@@ -293,9 +293,9 @@ void FD_Full_Step_Morpho3_3()
 
 		FD_1_Step(&ImgRead1,&ImgRead,&dif);
 
-		//morpho_Erosion3_3(&dif,&out);
+		morpho_Dilatation3_3(&dif,&out);
 		//morpho_Dilatation3_3(&out,&dif);
-		fermeture3_3(&dif,&inter,&out); // provoc des erreurs de sgmentation
+		//fermeture3_3(&dif,&inter,&out); // provoc des erreurs de sgmentation
 		writePGM(&out,i,"FD_Morpho3_3/FD_Morpho3_3_car_");
 	}
 	//printf("Fin FD morpho 3_3\n");
@@ -440,12 +440,12 @@ void SD_Full_Step_Morpho3_3()
                 //fermeture3_3(&Ot,&inter,&out);
                 //ouverture3_3(&out,&inter,&Ot);
 
-               ouverture3_3(&Ot,&inter,&out);
-              	fermeture3_3(&out,&inter,&Ot);
+               //ouverture3_3(&Ot,&inter,&out);
+              	fermeture3_3(&Ot,&inter,&out);
 
                 
 
-                writePGM(&Ot,k,"SD_Morpho3_3/SDcar3_3_");
+                writePGM(&out,k,"SD_Morpho3_3/SDcar3_3_");
         }
         //printf("FIN SD Morpho 3_3\n");
 }
@@ -497,7 +497,11 @@ int main()
 /*image_SEE in,out;
 readPGM_SEE("car3/car_3100.pgm",&in);
 	morpho_SEE_Erosion3_3( &in,  &out);*/
-	FD_Full_Step_Morpho3_3_SEE();
+	
+	//chrono(FD_Full_Step_Morpho3_3);
+	//chrono(FD_Full_Step_Morpho3_3_SEE);
+	
+	//FD_Full_Step_NO_Morpho_SEE();
 
 
 //FD SANS OPTI
@@ -534,7 +538,7 @@ readPGM_SEE("car3/car_3100.pgm",&in);
 
 // BENCH MARQUE DE CHAQUE FONCTION 
 
-//chrono(FD_Full_Step_NO_Morpho);
+chrono(FD_Full_Step_NO_Morpho);
 
 //chrono(SD_Full_Step_NO_Morpho);
 
@@ -555,7 +559,7 @@ readPGM("FD_SEE/FDSEEcar_99.pgm",&image);
 readPGM("Verite/car_100.pgm",&verite);
 	roc(&image,&verite,MROC);
 	displayROC(MROC);	*/
-	//chrono(FD_Full_Step_NO_Morpho_SEE);
+	chrono(FD_Full_Step_NO_Morpho_SEE);
 	
 
 	return 0;
