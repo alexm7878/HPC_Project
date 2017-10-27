@@ -19,8 +19,8 @@
 
 	void morpho_SSE_Erosion3_3(image_SEE* in, image_SEE* out);
 	void morpho_SSE_Dilatation3_3(image_SEE* in, image_SEE* out);
-	void fermeture_SSE3_3(image_t* in, image_t* inter, image_t* out);
-	void ouverture_SSE3_3(image_t* in, image_t* inter, image_t* out);
+	void fermeture_SSE3_3(image_SEE* in, image_SEE* inter, image_SEE* out);
+	void ouverture_SSE3_3(image_SEE* in, image_SEE* inter, image_SEE* out);
 	
 	void morpho_SSE_Erosion5_5(image_SEE* in, image_SEE* out);
 	void morpho_SSE_Dilatation5_5(image_SEE* in, image_SEE* out);

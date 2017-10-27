@@ -244,7 +244,7 @@ void FD_Full_Step_Morpho3_3_SEE()
 		FD_1_Step_SEE(&ImageSEE1,&ImageSEE2,&dif);
 	
 
-		morpho_SSE_Dilatation3_3(&dif, &out);
+		morpho_SSE_Erosion3_3(&dif, &out);
 		//ouverture_SSE3_3(&dif,&inter,&out);
 		//copyImage_SEE_to_Image_t(&dif,&ImgRead);
 		//writePGM(&ImgRead,i,"FDSEE/FDSEEcar_");

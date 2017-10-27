@@ -171,34 +171,36 @@ for(i=0;i<in->h;i++)
 		y = _mm_load_si128(&in->data[i][j+1]);
 		z = _mm_load_si128(&in->data[i+1][j+1]);
 
+		
 		res2 = _mm_min_epu8(x,y);
 
 		res2 = _mm_min_epu8(res2,z);
-
-		//display_vuint8(res2, "%d ", "res2 "); puts("");
+		//display_vuint8(res2, "%d ", "z "); puts("");
+		
 		res2=_mm_bslli_si128(res2,15);
 		//res2=_mm_bslli_si128(res2,15);
 		
 		res2 = _mm_or_si128(maskORD,res2);
-		//display_vuint8(res2, "%d ", "res2 "); puts(""); 
+	//	display_vuint8(res2, "%d ", "res2 "); puts(""); 
 			
 	//RECUPERATION DE LA LIGNE PRECEDENTE
 		x = _mm_load_si128(&in->data[i-1][j-1]);
 		y = _mm_load_si128(&in->data[i][j-1]);
 		z = _mm_load_si128(&in->data[i+1][j-1]);
-	
+		
 		res3 = _mm_min_epu8(x,y);
 		res3 = _mm_min_epu8(res3,z);
-		//display_vuint8(res3, "%d ", "res "); puts("");
+		//display_vuint8(res3, "%d ", "res  "); puts("");
 		res3=_mm_bsrli_si128(res3,15);
 		//display_vuint8(res3, "%d ", "res3 "); puts("");
 		res3 = _mm_or_si128(maskOR,res3);
-		//display_vuint8(res3, "%d ", "res3 "); puts("");
+		//display_vuint8(res3, "%d ", "res4 "); puts("");
 
 		res = _mm_min_epu8(res,base1);
 		res = _mm_min_epu8(res,basem1);
 		res = _mm_min_epu8(res,res2);
 		res = _mm_min_epu8(res,res3);
+
 		//display_vuint8(res, "%d ", "final "); puts("");
 
 		_mm_store_si128(&out->data[i][j],res);
@@ -221,83 +223,83 @@ void morpho_SSE_Dilatation3_3(image_SEE* in, image_SEE* out)
 	maskORD2 =_mm_set_epi8(255,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
 
 
-for(i=0;i<in->h;i++)
-{
-	for(j=0;j<in->w/16;j++)
+	for(i=0;i<in->h;i++)
 	{
-		x = _mm_load_si128(&in->data[i-1][j]);
-		y = _mm_load_si128(&in->data[i][j]);
-		z = _mm_load_si128(&in->data[i+1][j]);
-	
-		//display_vuint8(x, "%d ", "X "); puts("");
-		res = _mm_max_epu8(x,y);
-		res = _mm_max_epu8(res,z);
-
-		//display_vuint8(res, "%d ", "res "); puts("");
-
-		//base décalé de 1 a droite
-		base1=_mm_bsrli_si128(res,1);
-		//display_vuint8(base1, "%d ", "base1 "); puts("");
-		base1 = _mm_and_si128(maskORD,base1);
-	//	display_vuint8(base1, "%d ", "base1 "); puts("");
-	
-		//base décalé de 1 a gauche
-		basem1=_mm_bslli_si128(res,1);
-		//display_vuint8(basem1, "%d ", "basem1 "); puts("");
-		basem1 = _mm_and_si128(maskOR,basem1);
+		for(j=0;j<in->w/16;j++)
+		{
+			x = _mm_load_si128(&in->data[i-1][j]);
+			y = _mm_load_si128(&in->data[i][j]);
+			z = _mm_load_si128(&in->data[i+1][j]);
 		
-		//display_vuint8(basem1, "%d ", "basem1 "); puts("");
+			//display_vuint8(x, "%d ", "X "); puts("");
+			res = _mm_max_epu8(x,y);
+			res = _mm_max_epu8(res,z);
 
+			//display_vuint8(res, "%d ", "res "); puts("");
 
-		//RECUPERATION DE LA LIGNE suivante
-		x = _mm_load_si128(&in->data[i-1][j+1]);
-		y = _mm_load_si128(&in->data[i][j+1]);
-		z = _mm_load_si128(&in->data[i+1][j+1]);
-
-		res2 = _mm_max_epu8(x,y);
-
-		res2 = _mm_max_epu8(res2,z);
-
-		//display_vuint8(res2, "%d ", "res2 "); puts("");
-		res2=_mm_bslli_si128(res2,15);
-		//res2=_mm_bslli_si128(res2,15);
+			//base décalé de 1 a droite
+			base1=_mm_bsrli_si128(res,1);
+			//display_vuint8(base1, "%d ", "base1 "); puts("");
+			base1 = _mm_and_si128(maskORD,base1);
+		//	display_vuint8(base1, "%d ", "base1 "); puts("");
 		
-		res2 = _mm_and_si128(maskORD2,res2);
-		//display_vuint8(res2, "%d ", "res2 "); puts(""); 
+			//base décalé de 1 a gauche
+			basem1=_mm_bslli_si128(res,1);
+			//display_vuint8(basem1, "%d ", "basem1 "); puts("");
+			basem1 = _mm_and_si128(maskOR,basem1);
 			
-	//RECUPERATION DE LA LIGNE PRECEDENTE
-		x = _mm_load_si128(&in->data[i-1][j-1]);
-		y = _mm_load_si128(&in->data[i][j-1]);
-		z = _mm_load_si128(&in->data[i+1][j-1]);
-	
-		res3 = _mm_max_epu8(x,y);
-		res3 = _mm_max_epu8(res3,z);
-		//display_vuint8(res3, "%d ", "res "); puts("");
-		res3=_mm_bsrli_si128(res3,15);
-		//display_vuint8(res3, "%d ", "res3 "); puts("");
-		res3 = _mm_and_si128(maskOR2,res3);
-		//display_vuint8(res3, "%d ", "res3 "); puts("");
+			//display_vuint8(basem1, "%d ", "basem1 "); puts("");
 
-		res = _mm_max_epu8(res,base1);
-		res = _mm_max_epu8(res,basem1);
-		res = _mm_max_epu8(res,res2);
-		res = _mm_max_epu8(res,res3);
-		//display_vuint8(res, "%d ", "final "); puts("");
 
-		_mm_store_si128(&out->data[i][j],res);
+			//RECUPERATION DE LA LIGNE suivante
+			x = _mm_load_si128(&in->data[i-1][j+1]);
+			y = _mm_load_si128(&in->data[i][j+1]);
+			z = _mm_load_si128(&in->data[i+1][j+1]);
 
-	}
+			res2 = _mm_max_epu8(x,y);
+
+			res2 = _mm_max_epu8(res2,z);
+
+			//display_vuint8(res2, "%d ", "res2 "); puts("");
+			res2=_mm_bslli_si128(res2,15);
+			//res2=_mm_bslli_si128(res2,15);
+			
+			res2 = _mm_and_si128(maskORD2,res2);
+			//display_vuint8(res2, "%d ", "res2 "); puts(""); 
+				
+		//RECUPERATION DE LA LIGNE PRECEDENTE
+			x = _mm_load_si128(&in->data[i-1][j-1]);
+			y = _mm_load_si128(&in->data[i][j-1]);
+			z = _mm_load_si128(&in->data[i+1][j-1]);
+		
+			res3 = _mm_max_epu8(x,y);
+			res3 = _mm_max_epu8(res3,z);
+			//display_vuint8(res3, "%d ", "res "); puts("");
+			res3=_mm_bsrli_si128(res3,15);
+			//display_vuint8(res3, "%d ", "res3 "); puts("");
+			res3 = _mm_and_si128(maskOR2,res3);
+			//display_vuint8(res3, "%d ", "res3 "); puts("");
+
+			res = _mm_max_epu8(res,base1);
+			res = _mm_max_epu8(res,basem1);
+			res = _mm_max_epu8(res,res2);
+			res = _mm_max_epu8(res,res3);
+			//display_vuint8(res, "%d ", "final "); puts("");
+
+			_mm_store_si128(&out->data[i][j],res);
+
+		}
 }
 	
 
 }
 
-void fermeture_SSE3_3(image_t* in, image_t* inter, image_t* out)
+void fermeture_SSE3_3(image_SEE* in, image_SEE* inter, image_SEE* out)
 {
 	morpho_SSE_Erosion3_3(in,inter);
 	morpho_SSE_Dilatation3_3(inter,out);
 }
-void ouverture_SSE3_3(image_t* in, image_t* inter, image_t* out)
+void ouverture_SSE3_3(image_SEE* in, image_SEE* inter, image_SEE* out)
 {
 	morpho_SSE_Dilatation3_3(inter,out);
 	morpho_SSE_Erosion3_3(in,inter);
