@@ -1,5 +1,15 @@
 
 #include "mouvement_SSE2.h"
+#define _mm_cmpge_epu8(a, b) \
+        _mm_cmpeq_epi8(_mm_max_epu8(a, b), a)
+
+#define _mm_cmple_epu8(a, b) _mm_cmpge_epu8(b, a)
+
+#define _mm_cmpgt_epu8(a, b) \
+        _mm_xor_si128(_mm_cmple_epu8(a, b), _mm_set1_epi8(-1))
+
+#define _mm_cmplt_epu8(a, b) _mm_cmpgt_epu8(b, a)
+
 
 void initImageSEE(image_SEE* Image, int w, int h,int intensity)
 {
@@ -20,14 +30,14 @@ void initImageSEE(image_SEE* Image, int w, int h,int intensity)
     s2v1D(si0, si1, card, &vi0, &vi1);
     v2m1D(vi0, vi1, card, &mi0, &mi1);*/
 
-    Image->data = vui8vectorArray(-2, Image->h+1);
+    Image->data = vui8vectorArray(0, Image->h-1);
 
-    si0 = -2;
-    si1 = Image->w+1;
+    si0 = 0;
+    si1 = Image->w-1;
     s2v1D(si0, si1, card, &vi0, &vi1);
     v2m1D(vi0, vi1, card, &mi0, &mi1);
 
-    for(i=-2;i<Image->h+2;i++)
+    for(i=0;i<Image->h;i++)
     {
     	Image->data[i] = vui8vector(vi0, vi1);
 
@@ -81,11 +91,10 @@ int readPGM_SEE(char* NomFichier, image_SEE* ImgRead)
 						tabLect[k] = fgetc(fp);
 						
 					}*/
-					  fread(&x, sizeof(vuint8), 1, fp);
-					//  fwrite(&(dif->data[i][j]), sizeof(vuint8), 1, fp);
-					//x =_mm_set_epi8(fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),
-						//	fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),
-							//fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp));
+					
+					x =_mm_set_epi8(fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),
+							fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),
+							fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp));
 					_mm_store_si128(&ImgRead->data[i][j/16],x);
 
 				}
@@ -143,7 +152,7 @@ void copyImage_SEE_to_Image_t(image_SEE* imageSEE,image_t* imaget)
 
 void FD_1_Step_SEE(image_SEE* ImageSEE1, image_SEE* ImageSEE2, image_SEE* dif)
 {
-	int i,j,k,l;
+	int i,j;
 	int c =card_vuint8();
 
 	vuint8  x,y,z, zero, valMax,teta ,cmp,neg,un;
@@ -160,12 +169,14 @@ void FD_1_Step_SEE(image_SEE* ImageSEE1, image_SEE* ImageSEE2, image_SEE* dif)
 			x = _mm_load_si128(&ImageSEE2->data[i][j]);
 			y = _mm_load_si128(&ImageSEE1->data[i][j]);
 			z = _mm_subs_epu8(x,y);
+			
+
+			//display_vuint8(z, "%d ", "z2 "); puts("");
 
 			cmp =_mm_cmplt_epi8(z ,teta);
 			x =_mm_or_si128(_mm_and_si128(cmp,zero),_mm_andnot_si128(cmp,valMax));
-			//display_vuint8(x, "%d ", "x "); puts("");
+
 			_mm_store_si128(&dif->data[i][j],x);
-			
 		}
 	}
 }
@@ -203,52 +214,6 @@ void FD_Full_Step_NO_Morpho_SEE()
 		//copyImage_SEE_to_Image_t(&dif,&ImgRead);
 		//writePGM(&ImgRead,i,"FDSEE/FDSEEcar_");
 		writePGM_SEE(&dif,i,"FDSEE/FDSEEcar_");
-	}
-
-	//printf("Fin FD sans morpho\n");
-	//freeImage_t(&ImgRead);
-	//freeImageSEE(&ImageSEE1);
-	//freeImageSEE(&ImageSEE2);
-	//freeImageSEE(&dif);
-
-}
-
-void FD_Full_Step_Morpho3_3_SEE()
-{
-	//printf("Demarage FD sans morpho\n");
-	image_t ImgRead;
-	image_t ImgRead1;
-	int i,j,k;
-	char nomFichier[50] ="";
-	char nomFichier2[50] ="";
-
-	image_SEE ImageSEE1,ImageSEE2, dif,out,inter;
-
-	readPGM_SEE("car3/car_3000.pgm",&ImageSEE1);
-	//readPGM("car3/car_3000.pgm",&ImgRead);
-
- 	initImageSEE(&out,ImageSEE1.w,ImageSEE1.h,ImageSEE1.maxInt);
-	initImageSEE(&ImageSEE2,ImageSEE1.w,ImageSEE1.h,ImageSEE1.maxInt);
-	initImageSEE(&dif,ImageSEE1.w,ImageSEE1.h,ImageSEE1.maxInt);
-	initImageSEE(&inter,ImageSEE1.w,ImageSEE1.h,ImageSEE1.maxInt);
-
-	for(i=0;i<199;i++){
-		Conc("car3/car_",3000+i,nomFichier);
-		Conc("car3/car_",3000+i+1,nomFichier2);
-
-		readPGM_SEE(nomFichier,&ImageSEE1);
-			//printf("L'image a bien été lu\n ");
-		readPGM_SEE(nomFichier2,&ImageSEE2);
-			//printf("L'image a bien été lu\n ");
-
-		FD_1_Step_SEE(&ImageSEE1,&ImageSEE2,&dif);
-	
-
-		morpho_SSE_Dilatation3_3(&dif, &out);
-		//ouverture_SSE3_3(&dif,&inter,&out);
-		//copyImage_SEE_to_Image_t(&dif,&ImgRead);
-		//writePGM(&ImgRead,i,"FDSEE/FDSEEcar_");
-		writePGM_SEE(&out,i,"FDSEE_Morpho3_3/FDSEEcar_");
 	}
 
 	//printf("Fin FD sans morpho\n");
@@ -299,26 +264,33 @@ void SD_1_Step_SEE(image_SEE* ImgRead, image_SEE* Ot, image_SEE* Vt, image_SEE* 
             display_vuint8(img_read, "%d ", "ig0 "); puts("");
             display_vuint8(vt, "%d ", "vt0 "); puts("");
 
-            sl = _mm_cmplt_epi8(mt, img_read);	// 0xFF si a < b ; 0 si a > b
-            	//display_vuint8(sl, "%d ", "sl "); puts("");
-            sg = _mm_cmpgt_epi8(mt, img_read);	// 0 si a < b; 0xFF si a > b
-            	//display_vuint8(sg, "%d ", "sg "); puts("");
+            
+            sl = _mm_cmplt_epu8(mt, img_read);	// 0xFF si a < b ; 0 si a > b
+            	display_vuint8(sl, "%d ", "sl "); puts("");
+            sg = _mm_cmpgt_epu8(mt, img_read);	// 0 si a < b; 0xFF si a > b
+            	display_vuint8(sg, "%d ", "sg "); puts("");
+          	
+
+
             mt = _mm_add_epi8(mt, _mm_or_si128(_mm_and_si128(sg,valMax), zero)); 	// mt ADD ( (Sl ET 255) OR 0 ) 
             mt = _mm_sub_epi8(mt, _mm_or_si128(_mm_and_si128(sl,valMax), zero));	// mt SUB ( (Sl ET 255) OR 0 ) 
 
-           // STEP 2 // abs	// 127 > 129....
+           // STEP 2 // abs
            	a = _mm_max_epu8(mt, img_read);
-           		display_vuint8(mt, "%d ", "mt1 "); puts("");
            	b = _mm_min_epu8(mt, img_read);
+           		display_vuint8(mt, "%d ", "mt1 "); puts("");
            		display_vuint8(img_read, "%d ", "ig1 "); puts("");
 
+           		display_vuint8(a, "%d ", "a "); puts("");
+           		display_vuint8(b, "%d ", "b "); puts("");
+            
             ot = _mm_sub_epi8(a, b);
             	display_vuint8(ot, "%d ", "ot1 "); puts("");
             	//display_vuint8(vt, "%d ", "vt1 "); puts("");
 			
            // STEP 3 
-            sl = _mm_cmplt_epi8(vt, _mm_mul_epu32(n,ot));	// 0xFF si a < b ; 0 si a > b
-            sg = _mm_cmpgt_epi8(vt, _mm_mul_epu32(n,ot));	// 0 si a < b; 0xFF si a > b
+            sl = _mm_cmplt_epu8(vt, _mm_mul_epu32(n,ot));	// 0xFF si a < b ; 0 si a > b
+            sg = _mm_cmpgt_epu8(vt, _mm_mul_epu32(n,ot));	// 0 si a < b; 0xFF si a > b
 
             vt = _mm_add_epi8(vt, _mm_or_si128(_mm_and_si128(sg,valMax), zero)); 	// mt ADD ( (Sl ET 255) OR 0 ) 
             display_vuint8(vt, "%d ", "vt2 "); puts("");
@@ -329,7 +301,7 @@ void SD_1_Step_SEE(image_SEE* ImgRead, image_SEE* Ot, image_SEE* Vt, image_SEE* 
             display_vuint8(vt, "%d ", "vt4 "); puts("");
             display_vuint8(ot, "%d ", "ot2 "); puts("");
            // STEP 4 
-            sl = _mm_cmplt_epi8(ot,vt);
+            sl = _mm_cmplt_epu8(ot,vt);
             ot = _mm_or_si128(_mm_andnot_si128(sl,valMax), zero);
 
             display_vuint8(ot, "%d ", "ot3 "); puts("");
@@ -398,7 +370,9 @@ void SD_Full_Step_NO_Morpho_SEE()
 	initImageSEE(&Vt,ImageSEE1.w,ImageSEE1.h,ImageSEE1.maxInt);
 	initImageSEE(&Ot,ImageSEE1.w,ImageSEE1.h,ImageSEE1.maxInt);
 
-	for(i=0;i<199;i++){
+	for(i=0;i<4;i++){//199;i++){
+		//i=0;
+		printf("============== i = %d ====================\n\n\n\n\n",i);
 		Conc("car3/car_",3000+i,nomFichier);
 		//Conc("car3/car_",3000+i+1,nomFichier2);
 
@@ -412,6 +386,7 @@ void SD_Full_Step_NO_Morpho_SEE()
 		//copyImage_SEE_to_Image_t(&dif,&ImgRead);
 		//writePGM(&ImgRead,i,"FDSEE/FDSEEcar_");
 		writePGM_SEE(&Ot,i,"SDSEE/SDSEEcar_");
+		printf ("i= %d\n",i);
 	}
 
 	//printf("Fin FD sans morpho\n");

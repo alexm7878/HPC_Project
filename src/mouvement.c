@@ -498,7 +498,7 @@ int main()
 readPGM_SEE("car3/car_3100.pgm",&in);
 	morpho_SEE_Erosion3_3( &in,  &out);*/
 	
-	FD_Full_Step_Morpho3_3_SEE();
+	//FD_Full_Step_Morpho3_3_SEE();
 	//chrono(FD_Full_Step_Morpho3_3_SEE);
 	
 	//FD_Full_Step_NO_Morpho_SEE();
@@ -508,7 +508,7 @@ readPGM_SEE("car3/car_3100.pgm",&in);
 
 //FD_Full_Step_NO_Morpho();
 
-FD_Full_Step_Morpho3_3();
+//FD_Full_Step_Morpho3_3();
 
 //FD_Full_Step_Morpho5_5();
 
@@ -528,7 +528,7 @@ FD_Full_Step_Morpho3_3();
 
 
 //SD OPTI
-//SD_Full_Step_NO_Morpho_SEE();
+SD_Full_Step_NO_Morpho_SEE();
 
 
   //main_Bench_FD();
