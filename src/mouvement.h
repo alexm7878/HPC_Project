@@ -20,7 +20,7 @@
 		
 	#define VMAX 50
 	#define VMIN 10
-	#define N 	1
+	#define N 3
 
 	static uint8_t imaxarg1,imaxarg2;
 	#define MAX(a,b) (imaxarg1=(a),imaxarg2=(b),(imaxarg1) > (imaxarg2) ?\

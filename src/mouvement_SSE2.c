@@ -244,7 +244,7 @@ void FD_Full_Step_Morpho3_3_SEE()
 		FD_1_Step_SEE(&ImageSEE1,&ImageSEE2,&dif);
 	
 
-		morpho_SSE_Erosion3_3(&dif, &out);
+		morpho_SSE_Dilatation3_3(&dif, &out);
 		//ouverture_SSE3_3(&dif,&inter,&out);
 		//copyImage_SEE_to_Image_t(&dif,&ImgRead);
 		//writePGM(&ImgRead,i,"FDSEE/FDSEEcar_");
@@ -292,36 +292,51 @@ void SD_1_Step_SEE(image_SEE* ImgRead, image_SEE* Ot, image_SEE* Vt, image_SEE* 
     	   // INIT
         	mt = _mm_load_si128(&Mt->data[i][j]);
             vt = _mm_load_si128(&Vt->data[i][j]);
-            ot = _mm_load_si128(&Ot->data[i][j]);
             img_read = _mm_load_si128(&ImgRead->data[i][j]);
 
            // STEP 1
+            display_vuint8(mt, "%d ", "mt0 "); puts("");
+            display_vuint8(img_read, "%d ", "ig0 "); puts("");
+            display_vuint8(vt, "%d ", "vt0 "); puts("");
+
             sl = _mm_cmplt_epi8(mt, img_read);	// 0xFF si a < b ; 0 si a > b
+            	//display_vuint8(sl, "%d ", "sl "); puts("");
             sg = _mm_cmpgt_epi8(mt, img_read);	// 0 si a < b; 0xFF si a > b
+            	//display_vuint8(sg, "%d ", "sg "); puts("");
+            mt = _mm_add_epi8(mt, _mm_or_si128(_mm_and_si128(sg,valMax), zero)); 	// mt ADD ( (Sl ET 255) OR 0 ) 
+            mt = _mm_sub_epi8(mt, _mm_or_si128(_mm_and_si128(sl,valMax), zero));	// mt SUB ( (Sl ET 255) OR 0 ) 
 
-            mt = _mm_add_epi8(mt, _mm_or_si128(_mm_and_si128(sl,valMax), zero)); 	// mt ADD ( (Sl ET 255) OR 0 ) 
-            mt = _mm_sub_epi8(mt, _mm_or_si128(_mm_and_si128(sg,valMax), zero));	// mt SUB ( (Sl ET 255) OR 0 ) 
-
-           // STEP 2 // abs
+           // STEP 2 // abs	// 127 > 129....
            	a = _mm_max_epu8(mt, img_read);
+           		display_vuint8(mt, "%d ", "mt1 "); puts("");
            	b = _mm_min_epu8(mt, img_read);
+           		display_vuint8(img_read, "%d ", "ig1 "); puts("");
 
             ot = _mm_sub_epi8(a, b);
-
+            	display_vuint8(ot, "%d ", "ot1 "); puts("");
+            	//display_vuint8(vt, "%d ", "vt1 "); puts("");
+			
            // STEP 3 
             sl = _mm_cmplt_epi8(vt, _mm_mul_epu32(n,ot));	// 0xFF si a < b ; 0 si a > b
             sg = _mm_cmpgt_epi8(vt, _mm_mul_epu32(n,ot));	// 0 si a < b; 0xFF si a > b
 
-            vt = _mm_add_epi8(vt, _mm_or_si128(_mm_and_si128(sl,valMax), zero)); 	// mt ADD ( (Sl ET 255) OR 0 ) 
-            vt = _mm_sub_epi8(vt, _mm_or_si128(_mm_and_si128(sg,valMax), zero));	// mt SUB ( (Sl ET 255) OR 0 ) 
+            vt = _mm_add_epi8(vt, _mm_or_si128(_mm_and_si128(sg,valMax), zero)); 	// mt ADD ( (Sl ET 255) OR 0 ) 
+            display_vuint8(vt, "%d ", "vt2 "); puts("");
+            vt = _mm_sub_epi8(vt, _mm_or_si128(_mm_and_si128(sl,valMax), zero));	// mt SUB ( (Sl ET 255) OR 0 ) 
+            display_vuint8(vt, "%d ", "vt3 "); puts("");
 
             vt = _mm_max_epu8(_mm_min_epu8(vt,vmax), vmin);
-
+            display_vuint8(vt, "%d ", "vt4 "); puts("");
+            display_vuint8(ot, "%d ", "ot2 "); puts("");
            // STEP 4 
             sl = _mm_cmplt_epi8(ot,vt);
             ot = _mm_or_si128(_mm_andnot_si128(sl,valMax), zero);
 
+            display_vuint8(ot, "%d ", "ot3 "); puts("");
+
             _mm_store_si128(&Ot->data[i][j],ot);
+            _mm_store_si128(&Mt->data[i][j],mt);
+            _mm_store_si128(&Vt->data[i][j],vt);
         }
     }
 }
