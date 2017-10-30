@@ -16,7 +16,7 @@
 
 
 
-	#define TETA 10
+	#define TETA 20
 		
 	#define VMAX 50
 	#define VMIN 30
