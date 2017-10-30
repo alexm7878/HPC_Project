@@ -247,14 +247,18 @@ void SD_1_Step_SEE(image_SEE* ImgRead, image_SEE* Ot, image_SEE* Vt, image_SEE* 
 
  	vuint8 zero =_mm_set1_epi8(0);
  	vuint8 valMax = _mm_set1_epi8(255);
- 	vuint8 n = _mm_set1_epi8(N);
  	vuint8 vmax = _mm_set1_epi8(VMAX);
 	vuint8 vmin = _mm_set1_epi8(VMIN);
 
 	for(i=0;i<ImgRead->h;i++){
     	for(j=0;j<ImgRead->w/c;j++){
 
-    	   // initialisation	// OK
+    		//RAPPEL 
+    		// Vmax = 50	// define
+    		// Vmin = 30	// define
+    		// N = 3 		// par defaut, define ne modifira pas celui-ci
+
+    	   // initialisation	
         	mt = _mm_load_si128(&Mt->data[i][j]);
             vt = _mm_load_si128(&Vt->data[i][j]);
             img_read = _mm_load_si128(&ImgRead->data[i][j]);
@@ -263,7 +267,7 @@ void SD_1_Step_SEE(image_SEE* ImgRead, image_SEE* Ot, image_SEE* Vt, image_SEE* 
             //display_vuint8(img_read, "%d ", "ig0 "); puts("");
             //display_vuint8(vt, "%d ", "vt0 "); puts("");
 
-            // STEP 1	// OK
+            // STEP 1	
             sl = _mm_cmplt_epu8(mt, img_read);	// 0xFF si a < b ; 0 si a > b
             sg = _mm_cmpgt_epu8(mt, img_read);	// 0 si a < b; 0xFF si a > b
           	
@@ -271,36 +275,29 @@ void SD_1_Step_SEE(image_SEE* ImgRead, image_SEE* Ot, image_SEE* Vt, image_SEE* 
             mt = _mm_sub_epi8(mt, _mm_or_si128(_mm_and_si128(sl,valMax), zero));	// mt SUB ( (Sl ET 255) OR 0 ) 
 
 
-           // STEP 2 // abs	// OK
-
+           // STEP 2 // abs
            	max = _mm_max_epu8(mt, img_read);
            	min = _mm_min_epu8(mt, img_read);
             
             ot = _mm_sub_epi8(max, min);
 
-            // <=> N = 4 car mul fait n'impossible	// OK
+            // <=> N = 3  fonction _mm_mul = error
             ot_bis = _mm_add_epi8(ot, ot);
             ot_bis = _mm_add_epi8(ot_bis, ot);
 
 			
            // STEP 3 
-            sl = _mm_cmplt_epu8(vt, ot_bis);//_mm_mul_epu32(n,ot));	// 0xFF si a < b ; 0 si a > b
-            sg = _mm_cmpgt_epu8(vt, ot_bis);//_mm_mul_epu32(n,ot));	// 0 si a < b; 0xFF si a > b
+            sl = _mm_cmplt_epu8(vt, ot_bis);	//_mm_mul_epu32(n,ot));	// 0xFF si a < b ; 0 si a > b
+            sg = _mm_cmpgt_epu8(vt, ot_bis);	//_mm_mul_epu32(n,ot));	// 0 si a < b; 0xFF si a > b
 
             vt = _mm_add_epi8(vt, _mm_or_si128(_mm_and_si128(sg,valMax), zero)); 	// mt ADD ( (Sl ET 255) OR 0 ) 
             vt = _mm_sub_epi8(vt, _mm_or_si128(_mm_and_si128(sl,valMax), zero));	// mt SUB ( (Sl ET 255) OR 0 ) 
             
-            //display_vuint8(vt, "%d ", "vt2 "); puts("");
             vt = _mm_max_epu8(_mm_min_epu8(vt,vmax), vmin);
-            //display_vuint8(vt, "%d ", "vt4 "); puts("");
-            //display_vuint8(ot, "%d ", "ot2 "); puts("");
-
 
            // STEP 4 
             sl = _mm_cmplt_epu8(ot,vt);
             ot = _mm_or_si128(_mm_andnot_si128(sl,valMax), zero);
-
-            //display_vuint8(ot, "%d ", "ot3 "); puts("");
 
             _mm_store_si128(&Ot->data[i][j],ot);
             _mm_store_si128(&Mt->data[i][j],mt);
