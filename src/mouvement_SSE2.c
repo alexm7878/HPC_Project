@@ -243,7 +243,7 @@ void SD_1_Step_SEE(image_SEE* ImgRead, image_SEE* Ot, image_SEE* Vt, image_SEE* 
 
 	int i,j;
 	int c =card_vuint8();
-	vuint8  mt,img_read,vt,	sl,sg,ot, a,b;
+	vuint8  mt,img_read,vt,	sl,sg,ot, ot_bis, max,min;
 
  	vuint8 zero =_mm_set1_epi8(0);
  	vuint8 valMax = _mm_set1_epi8(255);
@@ -254,57 +254,53 @@ void SD_1_Step_SEE(image_SEE* ImgRead, image_SEE* Ot, image_SEE* Vt, image_SEE* 
 	for(i=0;i<ImgRead->h;i++){
     	for(j=0;j<ImgRead->w/c;j++){
 
-    	   // INIT
+    	   // initialisation	// OK
         	mt = _mm_load_si128(&Mt->data[i][j]);
             vt = _mm_load_si128(&Vt->data[i][j]);
             img_read = _mm_load_si128(&ImgRead->data[i][j]);
 
-           // STEP 1
-            display_vuint8(mt, "%d ", "mt0 "); puts("");
-            display_vuint8(img_read, "%d ", "ig0 "); puts("");
-            display_vuint8(vt, "%d ", "vt0 "); puts("");
+            //display_vuint8(mt, "%d ", "mt0 "); puts("");
+            //display_vuint8(img_read, "%d ", "ig0 "); puts("");
+            //display_vuint8(vt, "%d ", "vt0 "); puts("");
 
-            
+            // STEP 1	// OK
             sl = _mm_cmplt_epu8(mt, img_read);	// 0xFF si a < b ; 0 si a > b
-            	display_vuint8(sl, "%d ", "sl "); puts("");
             sg = _mm_cmpgt_epu8(mt, img_read);	// 0 si a < b; 0xFF si a > b
-            	display_vuint8(sg, "%d ", "sg "); puts("");
           	
-
-
-            mt = _mm_add_epi8(mt, _mm_or_si128(_mm_and_si128(sg,valMax), zero)); 	// mt ADD ( (Sl ET 255) OR 0 ) 
+            mt = _mm_add_epi8(mt, _mm_or_si128(_mm_and_si128(sg,valMax), zero)); 	// mt ADD ( (Sg ET 255) OR 0 ) 
             mt = _mm_sub_epi8(mt, _mm_or_si128(_mm_and_si128(sl,valMax), zero));	// mt SUB ( (Sl ET 255) OR 0 ) 
 
-           // STEP 2 // abs
-           	a = _mm_max_epu8(mt, img_read);
-           	b = _mm_min_epu8(mt, img_read);
-           		display_vuint8(mt, "%d ", "mt1 "); puts("");
-           		display_vuint8(img_read, "%d ", "ig1 "); puts("");
 
-           		display_vuint8(a, "%d ", "a "); puts("");
-           		display_vuint8(b, "%d ", "b "); puts("");
+           // STEP 2 // abs	// OK
+
+           	max = _mm_max_epu8(mt, img_read);
+           	min = _mm_min_epu8(mt, img_read);
             
-            ot = _mm_sub_epi8(a, b);
-            	display_vuint8(ot, "%d ", "ot1 "); puts("");
-            	//display_vuint8(vt, "%d ", "vt1 "); puts("");
+            ot = _mm_sub_epi8(max, min);
+
+            // <=> N = 4 car mul fait n'impossible	// OK
+            ot_bis = _mm_add_epi8(ot, ot);
+            ot_bis = _mm_add_epi8(ot_bis, ot);
+
 			
            // STEP 3 
-            sl = _mm_cmplt_epu8(vt, _mm_mul_epu32(n,ot));	// 0xFF si a < b ; 0 si a > b
-            sg = _mm_cmpgt_epu8(vt, _mm_mul_epu32(n,ot));	// 0 si a < b; 0xFF si a > b
+            sl = _mm_cmplt_epu8(vt, ot_bis);//_mm_mul_epu32(n,ot));	// 0xFF si a < b ; 0 si a > b
+            sg = _mm_cmpgt_epu8(vt, ot_bis);//_mm_mul_epu32(n,ot));	// 0 si a < b; 0xFF si a > b
 
             vt = _mm_add_epi8(vt, _mm_or_si128(_mm_and_si128(sg,valMax), zero)); 	// mt ADD ( (Sl ET 255) OR 0 ) 
-            display_vuint8(vt, "%d ", "vt2 "); puts("");
             vt = _mm_sub_epi8(vt, _mm_or_si128(_mm_and_si128(sl,valMax), zero));	// mt SUB ( (Sl ET 255) OR 0 ) 
-            display_vuint8(vt, "%d ", "vt3 "); puts("");
-
+            
+            //display_vuint8(vt, "%d ", "vt2 "); puts("");
             vt = _mm_max_epu8(_mm_min_epu8(vt,vmax), vmin);
-            display_vuint8(vt, "%d ", "vt4 "); puts("");
-            display_vuint8(ot, "%d ", "ot2 "); puts("");
+            //display_vuint8(vt, "%d ", "vt4 "); puts("");
+            //display_vuint8(ot, "%d ", "ot2 "); puts("");
+
+
            // STEP 4 
             sl = _mm_cmplt_epu8(ot,vt);
             ot = _mm_or_si128(_mm_andnot_si128(sl,valMax), zero);
 
-            display_vuint8(ot, "%d ", "ot3 "); puts("");
+            //display_vuint8(ot, "%d ", "ot3 "); puts("");
 
             _mm_store_si128(&Ot->data[i][j],ot);
             _mm_store_si128(&Mt->data[i][j],mt);
@@ -370,7 +366,7 @@ void SD_Full_Step_NO_Morpho_SEE()
 	initImageSEE(&Vt,ImageSEE1.w,ImageSEE1.h,ImageSEE1.maxInt);
 	initImageSEE(&Ot,ImageSEE1.w,ImageSEE1.h,ImageSEE1.maxInt);
 
-	for(i=0;i<4;i++){//199;i++){
+	for(i=0;i<199;i++){//199
 		//i=0;
 		printf("============== i = %d ====================\n\n\n\n\n",i);
 		Conc("car3/car_",3000+i,nomFichier);
@@ -386,7 +382,6 @@ void SD_Full_Step_NO_Morpho_SEE()
 		//copyImage_SEE_to_Image_t(&dif,&ImgRead);
 		//writePGM(&ImgRead,i,"FDSEE/FDSEEcar_");
 		writePGM_SEE(&Ot,i,"SDSEE/SDSEEcar_");
-		printf ("i= %d\n",i);
 	}
 
 	//printf("Fin FD sans morpho\n");

@@ -19,7 +19,7 @@
 	#define TETA 10
 		
 	#define VMAX 50
-	#define VMIN 10
+	#define VMIN 30
 	#define N 3
 
 	static uint8_t imaxarg1,imaxarg2;
