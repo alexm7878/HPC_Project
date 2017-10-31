@@ -494,14 +494,14 @@ int main()
 
 
 
-/*image_SEE in,out;
-readPGM_SEE("car3/car_3100.pgm",&in);
-	morpho_SEE_Erosion3_3( &in,  &out);*/
+/*image_SSE in,out;
+readPGM_SSE("car3/car_3100.pgm",&in);
+	morpho_SSE_Erosion3_3( &in,  &out);*/
 	
-	//FD_Full_Step_Morpho3_3_SEE();
-	//chrono(FD_Full_Step_Morpho3_3_SEE);
+	//FD_Full_Step_Morpho3_3_SSE();
+	//chrono(FD_Full_Step_Morpho3_3_SSE);
 	
-	//FD_Full_Step_NO_Morpho_SEE();
+	//FD_Full_Step_NO_Morpho_SSE();
 
 
 //FD SANS OPTI
@@ -524,13 +524,13 @@ readPGM_SEE("car3/car_3100.pgm",&in);
 
 //FD_OPTI
 
-//FD_Full_Step_NO_Morpho_SEE();
-//SD_Full_Step_NO_Morpho_SEE();
-//FD_Full_Step_Morpho3_3_SEE();
-//SD_Full_Step_Morpho3_3_SEE();
+//FD_Full_Step_NO_Morpho_SSE();
+//SD_Full_Step_NO_Morpho_SSE();
+//FD_Full_Step_Morpho3_3_SSE();
+//SD_Full_Step_Morpho3_3_SSE();
 
 //SD OPTI
-//SD_Full_Step_NO_Morpho_SEE();
+//SD_Full_Step_NO_Morpho_SSE();
 
 
   //main_Bench_FD();
@@ -553,16 +553,17 @@ readPGM_SEE("car3/car_3100.pgm",&in);
 //chrono(SD_Full_Step_Morpho5_5);
 
 
-chrono(FD_Full_Step_Morpho3_3_SEE);
+/*chrono(FD_Full_Step_Morpho3_3_SSE);
 int MROC[2][2]={0,0,0,0};
 image_t image,verite;
 
-readPGM("FDSEE_Morpho3_3/FDSEEcar_99.pgm",&image);
+readPGM("FDSSE_Morpho3_3/FDSSEcar_99.pgm",&image);
 readPGM("Verite/car_100.pgm",&verite);
 	roc(&image,&verite,MROC);
-	displayROC(MROC);	
-	//chrono(FD_Full_Step_Morpho3_3_SEE);
-	
+	displayROC(MROC);	*/
 
+	//chrono(FD_Full_Step_Morpho3_3_SSE);
+	
+FD_Full_Step_Morpho5_5_SSE();
 	return 0;
 }

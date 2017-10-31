@@ -17,11 +17,14 @@
 
 	//VERSION SDE
 
-	void morpho_SSE_Erosion3_3(image_SEE* in, image_SEE* out);
-	void morpho_SSE_Dilatation3_3(image_SEE* in, image_SEE* out);
-	void fermeture_SSE3_3(image_SEE* in, image_SEE* inter, image_SEE* out);
-	void ouverture_SSE3_3(image_SEE* in, image_SEE* inter, image_SEE* out);
+	void morpho_SSE_Erosion3_3(image_SSE* in, image_SSE* out);
+	void morpho_SSE_Dilatation3_3(image_SSE* in, image_SSE* out);
+	void fermeture_SSE3_3(image_SSE* in, image_SSE* inter, image_SSE* out);
+	void ouverture_SSE3_3(image_SSE* in, image_SSE* inter, image_SSE* out);
 	
-	void morpho_SSE_Erosion5_5(image_SEE* in, image_SEE* out);
-	void morpho_SSE_Dilatation5_5(image_SEE* in, image_SEE* out);
+	void morpho_SSE_Erosion5_5(image_SSE* in, image_SSE* out);
+	void morpho_SSE_Dilatation5_5(image_SSE* in, image_SSE* out);
+	void fermeture_SSE5_5(image_SSE* in, image_SSE* inter, image_SSE* out);
+	void ouverture_SSE5_5(image_SSE* in, image_SSE* inter, image_SSE* out);
+	
 #endif
