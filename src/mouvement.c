@@ -524,8 +524,10 @@ readPGM_SEE("car3/car_3100.pgm",&in);
 
 //FD_OPTI
 
-FD_Full_Step_NO_Morpho_SEE();
-
+//FD_Full_Step_NO_Morpho_SEE();
+//SD_Full_Step_NO_Morpho_SEE();
+//FD_Full_Step_Morpho3_3_SEE();
+//SD_Full_Step_Morpho3_3_SEE();
 
 //SD OPTI
 //SD_Full_Step_NO_Morpho_SEE();
@@ -551,14 +553,14 @@ FD_Full_Step_NO_Morpho_SEE();
 //chrono(SD_Full_Step_Morpho5_5);
 
 
-/*chrono(FD_Full_Step_NO_Morpho_SEE);
+chrono(FD_Full_Step_Morpho3_3_SEE);
 int MROC[2][2]={0,0,0,0};
 image_t image,verite;
 
-readPGM("FD_SEE/FDSEEcar_99.pgm",&image);
+readPGM("FDSEE_Morpho3_3/FDSEEcar_99.pgm",&image);
 readPGM("Verite/car_100.pgm",&verite);
 	roc(&image,&verite,MROC);
-	displayROC(MROC);	*/
+	displayROC(MROC);	
 	//chrono(FD_Full_Step_Morpho3_3_SEE);
 	
 

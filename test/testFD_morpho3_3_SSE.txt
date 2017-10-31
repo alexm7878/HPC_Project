@@ -1,0 +1,12 @@
+ total cycles : 46080129809.000000,
+   cycles par iteration : 4608012980.900000 ,
+  cycles par image : 23040064.904500 ,
+  cycles par point : 300.000845 
+
+ total temps(ms) : 57600.162261 ,
+  temps par iteration : 5760.016226 ,
+  temps par image : 28.800081 ,
+  temps par pixel : 0.000375 
+
+ VP = 1399	 FN = 1981
+ FP = 329	 VN =73091
