@@ -67,7 +67,7 @@ int readPGM(char* NomFichier, image_t* ImgRead)
 
 	fp=fopen(NomFichier,"r");
 	if(fp != NULL)
-	{
+	{	
 			// Lecture du mot permettant de reconnaitre le PGM 
 			fgets(chaine, 1000, fp);
 			strncpy(motMagique,chaine,2);
@@ -228,7 +228,6 @@ void writePPM(image_t* dif, int k, char* dossier)
 	
 
 }
-
 
 // fonction lancant l'algorithm FD sur toute les photos
 void FD_Full_Step_NO_Morpho()
@@ -489,81 +488,25 @@ void SD_Full_Step_Morpho5_5()
 }
 
 
-int main()
+void compareImage(image_t* image1, image_t* image2)
 {
+    int i,j;
+    int cpt=0;
 
+    for(i=0;i<image1->h;i++)
+    {
+        for(j=0;j<image1->w;j++)
+        {
+            if(image1->data[i][j] == image2->data[i][j])
+            {
+                cpt++;
+            }else
+            {
+                printf("ici erreur i = %d , j= %d\n",i,j);
+            }
+        }
+    }
 
+    printf("il a %d pixel corect sur %d, soit %f pourcent\n",cpt,240*320, cpt*100.0/(240*320));
 
-/*image_SSE in,out;
-readPGM_SSE("car3/car_3100.pgm",&in);
-	morpho_SSE_Erosion3_3( &in,  &out);*/
-	
-	//FD_Full_Step_Morpho3_3_SSE();
-	//chrono(FD_Full_Step_Morpho3_3_SSE);
-	
-	//FD_Full_Step_NO_Morpho_SSE();
-
-
-//FD SANS OPTI
-
-//FD_Full_Step_NO_Morpho();
-
-//FD_Full_Step_Morpho3_3();
-
-//FD_Full_Step_Morpho5_5();
-
-
-//SD SANS OPTI
-
-//SD_Full_Step_NO_Morpho();
-
-//SD_Full_Step_Morpho3_3();
-
-//SD_Full_Step_Morpho5_5();
-
-
-//FD_OPTI
-
-//FD_Full_Step_NO_Morpho_SSE();
-//SD_Full_Step_NO_Morpho_SSE();
-//FD_Full_Step_Morpho3_3_SSE();
-//SD_Full_Step_Morpho3_3_SSE();
-
-//SD OPTI
-//SD_Full_Step_NO_Morpho_SSE();
-
-
-  //main_Bench_FD();
-  
-  //main_Bench_SD();
-
-
-// BENCH MARQUE DE CHAQUE FONCTION 
-
-//chrono(FD_Full_Step_NO_Morpho);
-
-//chrono(SD_Full_Step_NO_Morpho);
-
-//chrono(FD_Full_Step_Morpho3_3);
-
-//chrono(FD_Full_Step_Morpho5_5);
-
-
-//chrono(SD_Full_Step_Morpho3_3);
-//chrono(SD_Full_Step_Morpho5_5);
-
-
-/*chrono(FD_Full_Step_Morpho3_3_SSE);
-int MROC[2][2]={0,0,0,0};
-image_t image,verite;
-
-readPGM("FDSSE_Morpho3_3/FDSSEcar_99.pgm",&image);
-readPGM("Verite/car_100.pgm",&verite);
-	roc(&image,&verite,MROC);
-	displayROC(MROC);	*/
-
-	//chrono(FD_Full_Step_Morpho3_3_SSE);
-	
-FD_Full_Step_Morpho5_5_SSE();
-	return 0;
 }

@@ -1,0 +1,144 @@
+
+printf("\n FD\n");
+chrono(FD_Full_Step_NO_Morpho);
+chrono(FD_Full_Step_Morpho3_3);
+chrono(FD_Full_Step_Morpho5_5);
+chrono(FD_Full_Step_NO_Morpho_SSE);
+chrono(FD_Full_Step_Morpho3_3_SSE);
+//chrono(FD_Full_Step_Morpho5_5_SSE);
+
+printf("\n SD\n");
+chrono(SD_Full_Step_NO_Morpho);
+chrono(SD_Full_Step_Morpho3_3);
+chrono(SD_Full_Step_Morpho5_5);
+chrono(SD_Full_Step_NO_Morpho);
+chrono(SD_Full_Step_Morpho3_3_SSE);
+//chrono(SD_Full_Step_Morpho5_5_SSE);
+
+
+==========================================
+
+ FD
+
+********** chrono(FD_Full_Step_NO_Morpho) **********
+ total cycles : 53277841543.000000,
+   cycles par iteration : 5327784154.300000 ,
+  cycles par image : 26638920.771500 ,
+  cycles par point : 346.860948 
+
+ total temps(ms) : 66597.301929 ,
+  temps par iteration : 6659.730193 ,
+  temps par image : 33.298651 ,
+  temps par pixel : 0.000434 
+
+
+**********  chrono(FD_Full_Step_Morpho3_3) ********** 
+ total cycles : 71259389167.000000,
+   cycles par iteration : 7125938916.700000 ,
+  cycles par image : 35629694.583500 ,
+  cycles par point : 463.928315 
+
+ total temps(ms) : 89074.236459 ,
+  temps par iteration : 8907.423646 ,
+  temps par image : 44.537118 ,
+  temps par pixel : 0.000580 
+
+
+**********   chrono(FD_Full_Step_Morpho5_5) **********  
+ total cycles : 163588413314.000000,
+   cycles par iteration : 16358841331.400000 ,
+  cycles par image : 81794206.657000 ,
+  cycles par point : 1065.028733 
+
+ total temps(ms) : 204485.516642 ,
+  temps par iteration : 20448.551664 ,
+  temps par image : 102.242758 ,
+  temps par pixel : 0.001331 
+
+
+**********   chrono(FD_Full_Step_NO_Morpho_SSE) **********   
+ total cycles : 9232468541.000000,
+   cycles par iteration : 923246854.100000 ,
+  cycles par image : 4616234.270500 ,
+  cycles par point : 60.107217 
+
+ total temps(ms) : 11540.585676 ,
+  temps par iteration : 1154.058568 ,
+  temps par image : 5.770293 ,
+  temps par pixel : 0.000075 
+
+
+**********   chrono(FD_Full_Step_Morpho3_3_SSE) **********   
+ total cycles : 14848312384.000000,
+   cycles par iteration : 1484831238.400000 ,
+  cycles par image : 7424156.192000 ,
+  cycles par point : 96.668700 
+
+ total temps(ms) : 18560.390480 ,
+  temps par iteration : 1856.039048 ,
+  temps par image : 9.280195 ,
+  temps par pixel : 0.000121 
+
+
+
+
+ SD
+
+********** chrono(SD_Full_Step_NO_Morpho) **********
+ total cycles : 59716254884.000000,
+   cycles par iteration : 5971625488.400000 ,
+  cycles par image : 29858127.442000 ,
+  cycles par point : 388.777701 
+
+ total temps(ms) : 35127.208755 ,
+  temps par iteration : 3512.720876 ,
+  temps par image : 17.563604 ,
+  temps par pixel : 0.000229 
+
+
+**********  chrono(SD_Full_Step_Morpho3_3) ********** 
+ total cycles : 96989715555.000000,
+   cycles par iteration : 9698971555.500000 ,
+  cycles par image : 48494857.777500 ,
+  cycles par point : 631.443461 
+
+ total temps(ms) : 121237.144444 ,
+  temps par iteration : 12123.714444 ,
+  temps par image : 60.618572 ,
+  temps par pixel : 0.000789 
+
+
+**********  chrono(SD_Full_Step_Morpho5_5) ********** 
+ total cycles : 274654740810.000000,
+   cycles par iteration : 27465474081.000000 ,
+  cycles par image : 137327370.405000 ,
+  cycles par point : 1788.116802 
+
+ total temps(ms) : 343318.426013 ,
+  temps par iteration : 34331.842601 ,
+  temps par image : 171.659213 ,
+  temps par pixel : 0.002235 
+
+
+**********   chrono(FD_Full_Step_NO_Morpho_SSE) **********   
+ total cycles : 9068272446.000000,
+   cycles par iteration : 906827244.600000 ,
+  cycles par image : 4534136.223000 ,
+  cycles par point : 59.038232 
+
+ total temps(ms) : 11335.340557 ,
+  temps par iteration : 1133.534056 ,
+  temps par image : 5.667670 ,
+  temps par pixel : 0.000074 
+
+
+**********   chrono(FD_Full_Step_Morpho3_3_SSE) **********  
+ total cycles : 9951748943.000000,
+   cycles par iteration : 995174894.300000 ,
+  cycles par image : 4975874.471500 ,
+  cycles par point : 64.790032 
+
+ total temps(ms) : 12439.686179 ,
+  temps par iteration : 1243.968618 ,
+  temps par image : 6.219843 ,
+  temps par pixel : 0.000081 

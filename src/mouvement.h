@@ -51,9 +51,12 @@
 	void FD_Full_Step_NO_Morpho();
 	void FD_Full_Step_Morpho3_3();
 	void FD_Full_Step_Morpho5_5();
+
 	void SD_1_step(image_t* ImgRead, image_t* Ot, image_t* Vt, image_t* Mt);
 	void SD_Full_Step_NO_Morpho();
 	void SD_Full_Step_Morpho3_3();
 	void SD_Full_Step_Morpho5_5();
+
+	void compareImage(image_t* image1, image_t* image2);
 
 #endif
