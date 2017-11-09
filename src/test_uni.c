@@ -1,34 +1,83 @@
-
 #include "mouvement_SSE2.h"
 
 
+/* NOTES A MOI-MEME
+
+	add => pb si addition dépasse 255; retour au debut
+		ex : 255 + 1 = 0 / 255 + 2 = 1   pas de bit n3?  0xff + 0x01  = 0x00 et non 0x100
+
+	finir tableaux drive/oracle code
+
+	faire fonction comparaison
+*/
+
+
+int comparaion_verif(__m128i val_comp, char **oracle){
+
+}
+
 int main(){
 
-// Tests SIMD
 
-vuint8 test_max, val_min, val_max, val127, val128;
-int val_test;
+// INIT
+	vuint8 resul_test[16];
+	int i;
+	__m128i test_cmplt;
+	char *val_test_hexa;
+/*
+ Rappel :
+ 	0 => 0x00
+ 	1 => 0x01
+ 	127 => 0x7F
+ 	128 => 0x80
+ 	254 => 0xFE
+ 	255 => 0xFF	
+*/
 
-val_min =_mm_set1_epi8(0);
-val_max = _mm_set1_epi8(255);
-val127 = _mm_set1_epi8(127);
-val128 = _mm_set1_epi8(128);
+// Oracle
+	char oracle[6][36] = {
+							{0,0,0,0,0,0, 255,0,0,0,0,0, 255,255,0,0,0,0, 255,255,255,0,0,0, 255,255,255,255,0,0, 255,255,255,255,255,0},
+							{}
+
+						 };
+
+	__m128i val = _mm_setr_epi8(0, 1, 127, 128, 254, 255,0,0,0,0,0,0,0,0,0,0);
+
+	__m128i _0= _mm_setr_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	__m128i _1= _mm_setr_epi8(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+	__m128i _127= _mm_setr_epi8(127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127);
+	__m128i _128= _mm_setr_epi8(128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128);
+	__m128i _254= _mm_setr_epi8(254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254);
+	__m128i _255= _mm_setr_epi8(255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255);
 
 
-test_max = _mm_max_epu8(val_min, val_max);
-val_test = _mm_store_si128(val_test,test_max);
+//_mm_cmplt_epu8 // 0xFF si a < b ; 0 sinon
+	 /*
+	 test_cmplt =  _mm_cmplt_epu8(val, _127);
+	 //comparaion_verif(test_cmplt,oracle);
+	 test_cmplt =  _mm_cmplt_epu8(val, _1); 
+	 test_cmplt =  _mm_cmplt_epu8(val, _127); 
+	 test_cmplt =  _mm_cmplt_epu8(val, _128); 
+	 test_cmplt =  _mm_cmplt_epu8(val, _254); 
+	 test_cmplt =  _mm_cmplt_epu8(val, _255); 
 
-if(val_test == val_max)
-	printf("test val max basique --- OK");
-else
-	printf("test val max basique --- ERROR");
+*/
+
+	 test_cmplt =  _mm_add_epi8(val, _255); 
+	// Affichage
+	val_test_hexa = (char *) &test_cmplt;
+/*
+	if(val_test_hexa[2] == 127)
+		printf("ok\n");
+	else printf("non ok\n" );
+*/
+	for(i = 0; i < 6; i++) 
+		printf("%04hhx ", val_test_hexa[i]);
+
+	printf("\n");
 
 
-
-
-
-
-return 0;
+	return 0;
 }
 
 
