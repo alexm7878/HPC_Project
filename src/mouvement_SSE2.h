@@ -12,6 +12,16 @@
 
 #define _mm_cmplt_epu8(a, b) _mm_cmpgt_epu8(b, a)
 
+#define _mm_add_epi8_limit(a, b) \
+    	_mm_max_epu8( _mm_or_si128(_mm_cmplt_epu8(_mm_add_epi8(a,b),a) , _mm_cmplt_epu8(_mm_add_epi8(a,b),b)) , _mm_add_epi8(a,b) )
+    	// MAX[lt(add, a) OR lt(add,b)]    
+#define _mm_sub_epi8_limit(a,b) \
+    	_mm_min_epu8( _mm_or_si128(_mm_cmplt_epu8(_mm_sub_epi8(a,b),a) , _mm_cmplt_epu8(_mm_sub_epi8(a,b),b)) , _mm_sub_epi8(a,b) )
+    	// MiIN[lt(sub, a) OR lt(sub,b)]
+
+
+
+
 	typedef struct image_SSE {
 		int w;
 		int h;

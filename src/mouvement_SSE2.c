@@ -1,14 +1,6 @@
 
 #include "mouvement_SSE2.h"
-#define _mm_cmpge_epu8(a, b) \
-        _mm_cmpeq_epi8(_mm_max_epu8(a, b), a)
 
-#define _mm_cmple_epu8(a, b) _mm_cmpge_epu8(b, a)
-
-#define _mm_cmpgt_epu8(a, b) \
-        _mm_xor_si128(_mm_cmple_epu8(a, b), _mm_set1_epi8(-1))
-
-#define _mm_cmplt_epu8(a, b) _mm_cmpgt_epu8(b, a)
 
 
 void initImageSSE(image_SSE* Image, int w, int h,int intensity)
@@ -171,7 +163,7 @@ void FD_1_Step_SSE(image_SSE* ImageSSE1, image_SSE* ImageSSE2, image_SSE* Ot)
 			max = _mm_max_epu8(it, it_1);
            	min = _mm_min_epu8(it, it_1);
             
-            ot = _mm_sub_epi8(max, min);
+            ot = _mm_sub_epi8_limit(max, min);
 
             // STEP 2
             sl = _mm_cmplt_epu8(ot,teta);
@@ -359,27 +351,27 @@ void SD_1_Step_SSE(image_SSE* ImgRead, image_SSE* Ot, image_SSE* Vt, image_SSE* 
             sl = _mm_cmplt_epu8(mt, img_read);	// 0xFF si a < b ; 0 si a > b
             sg = _mm_cmpgt_epu8(mt, img_read);	// 0 si a < b; 0xFF si a > b
           	
-            mt = _mm_add_epi8(mt, _mm_or_si128(_mm_and_si128(sg,valMax), zero)); 	// mt ADD ( (Sg ET 255) OR 0 ) 
-            mt = _mm_sub_epi8(mt, _mm_or_si128(_mm_and_si128(sl,valMax), zero));	// mt SUB ( (Sl ET 255) OR 0 ) 
+            mt = _mm_add_epi8_limit(mt, _mm_or_si128(_mm_and_si128(sg,valMax), zero)); 	// mt ADD ( (Sg ET 255) OR 0 ) 
+            mt = _mm_sub_epi8_limit(mt, _mm_or_si128(_mm_and_si128(sl,valMax), zero));	// mt SUB ( (Sl ET 255) OR 0 ) 
 
 
            // STEP 2 // abs
            	max = _mm_max_epu8(mt, img_read);
            	min = _mm_min_epu8(mt, img_read);
             
-            ot = _mm_sub_epi8(max, min);
+            ot = _mm_sub_epi8_limit(max, min);
 
             // <=> N = 3  fonction _mm_mul = error
-            ot_bis = _mm_add_epi8(ot, ot);
-            ot_bis = _mm_add_epi8(ot_bis, ot);
+            ot_bis = _mm_add_epi8_limit(ot, ot);
+            ot_bis = _mm_add_epi8_limit(ot_bis, ot);
 
 			
            // STEP 3 
             sl = _mm_cmplt_epu8(vt, ot_bis);	//_mm_mul_epu32(n,ot));	// 0xFF si a < b ; 0 si a > b
             sg = _mm_cmpgt_epu8(vt, ot_bis);	//_mm_mul_epu32(n,ot));	// 0 si a < b; 0xFF si a > b
 
-            vt = _mm_add_epi8(vt, _mm_or_si128(_mm_and_si128(sg,valMax), zero)); 	// mt ADD ( (Sl ET 255) OR 0 ) 
-            vt = _mm_sub_epi8(vt, _mm_or_si128(_mm_and_si128(sl,valMax), zero));	// mt SUB ( (Sl ET 255) OR 0 ) 
+            vt = _mm_add_epi8_limit(vt, _mm_or_si128(_mm_and_si128(sg,valMax), zero)); 	// mt ADD ( (Sl ET 255) OR 0 ) 
+            vt = _mm_sub_epi8_limit(vt, _mm_or_si128(_mm_and_si128(sl,valMax), zero));	// mt SUB ( (Sl ET 255) OR 0 ) 
             
             vt = _mm_max_epu8(_mm_min_epu8(vt,vmax), vmin);
 
