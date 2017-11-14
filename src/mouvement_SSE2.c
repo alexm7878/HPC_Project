@@ -83,10 +83,10 @@ int readPGM_SSE(char* NomFichier, image_SSE* ImgRead)
 						tabLect[k] = fgetc(fp);
 						
 					}*/
-					
-					x =_mm_set_epi8(fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),
-							fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),
-							fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp));
+					fread(&x, sizeof(vuint8), 1, fp);
+					//x =_mm_set_epi8(fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),
+					//		fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),
+					//		fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp));
 					_mm_store_si128(&ImgRead->data[i][j/16],x);
 
 				}
@@ -507,6 +507,54 @@ void SD_Full_Step_Morpho3_3_SSE()
 		//writePGM(&ImgRead,i,"FDSSE/FDSSEcar_");
 		morpho_SSE_Erosion3_3(&Ot, &out);
 		writePGM_SSE(&out,i,"SDSSE_Morpho3_3/SDSSEcar_");
+	}
+
+	//printf("Fin FD sans morpho\n");
+	//freeImage_t(&ImgRead);
+	//freeImageSSE(&ImageSSE1);
+	//freeImageSSE(&ImageSSE2);
+	//freeImageSSE(&dif);
+
+}
+
+void SD_Full_Step_Morpho5_5_SSE()
+{
+	//printf("Demarage FD sans morpho\n");
+	image_t ImgRead;
+	image_t ImgRead1;
+	int i;
+	char nomFichier[50] ="";
+	char nomFichier2[50] ="";
+
+	image_SSE ImageSSE1, Ot, Vt,  Mt,out;
+
+	readPGM_SSE("car3/car_3000.pgm",&ImageSSE1);
+	readPGM_SSE("car3/car_3001.pgm",&Mt);
+	
+
+
+	//initImageSSE(&ImageSSE2,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
+	initImageSSE(&Vt,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
+	initImageSSE(&Ot,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
+	initImageSSE(&out,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
+
+	for(i=0;i<199;i++){//199
+		//i=0;
+		//printf("============== i = %d ====================\n\n\n\n\n",i);
+		Conc("car3/car_",3000+i,nomFichier);
+		//Conc("car3/car_",3000+i+1,nomFichier2);
+
+		readPGM_SSE(nomFichier,&ImageSSE1);
+			//printf("L'image a bien été lu\n ");
+		//readPGM_SSE(nomFichier2,&ImageSSE2);
+			//printf("L'image a bien été lu\n ");
+
+		SD_1_Step_SSE(&ImageSSE1, &Ot, &Vt,&Mt);
+
+		//copyImage_SSE_to_Image_t(&dif,&ImgRead);
+		//writePGM(&ImgRead,i,"FDSSE/FDSSEcar_");
+		morpho_SSE_Erosion5_5(&Ot, &out);
+		writePGM_SSE(&out,i,"SDSSE_Morpho5_5/SDSSEcar_");
 	}
 
 	//printf("Fin FD sans morpho\n");

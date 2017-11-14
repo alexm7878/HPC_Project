@@ -1,5 +1,5 @@
 #include "mouvement_SSE2.h"
-
+#include "mouvement_SSE2.h"
 
 /* NOTES A MOI-MEME
 
@@ -97,7 +97,6 @@ int main(){
 */
 
 	SD_Full_Step_NO_Morpho();
-
 
 	return 0;
 }
