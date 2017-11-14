@@ -382,6 +382,19 @@ void SD_1_step(image_t* ImgRead, image_t* Ot, image_t* Vt, image_t* Mt)
 
 }
 
+void setVal_image(image_t* img, int val)
+{
+
+	int i,j;
+	for(i=0;i<img->h;i++)
+	{
+		for(j=0;j<img->w;j++)
+		{
+			img->data[i][j] = val;
+		}
+	}
+}
+
 void SD_Full_Step_NO_Morpho()
 {
         //printf("Démarage SD sans Morpho\n");
@@ -396,7 +409,7 @@ void SD_Full_Step_NO_Morpho()
 
         readPGM("car3/car_3001.pgm",&Mt);
 
-        cpy_Image(&Vt,&Mt);
+		setVal_image(&Vt,VMIN);
 
         for(k=0;k<199;k++){
                 Conc("car3/car_",3000+k,nomFichier);

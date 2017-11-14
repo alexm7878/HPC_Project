@@ -16,11 +16,11 @@
 
 
 
-	#define TETA 20
+	#define TETA 21
 		
-	#define VMAX 50
-	#define VMIN 30
-	#define N 3
+	#define VMAX 22
+	#define VMIN 10
+	#define N 7
 
 	static uint8_t imaxarg1,imaxarg2;
 	#define MAX(a,b) (imaxarg1=(a),imaxarg2=(b),(imaxarg1) > (imaxarg2) ?\

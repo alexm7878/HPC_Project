@@ -16,7 +16,7 @@ void morpho_Erosion3_3(image_t* in, image_t* out)
 			{
 				for(l=j-1;l<j+2;l++ )
 				{
-				  res = MIN(in->data[k][l],res);
+				  res = in->data[k][l] & res;
 				}
 			}
 			out->data[i][j] = res;
@@ -38,7 +38,7 @@ void morpho_Dilatation3_3(image_t* in, image_t* out)
 			{
 				for(l=j-1;l<j+2;l++ )
 				{
-				 	 res = MAX(in->data[k][l],res);
+				 	 res = in->data[k][l] | res;
 				}
 			}
 			out->data[i][j] = res;
@@ -61,7 +61,7 @@ void morpho_Erosion5_5(image_t* in,image_t* out)
 			{
 				for(l=j-2;l<j+3;l++ )
 				{
-				  res = MIN(in->data[k][l],res);
+				  res = in->data[k][l] & res;
 				}
 			}
 			out->data[i][j] = res;
@@ -85,7 +85,7 @@ void morpho_Dilatation5_5(image_t* in,image_t* out)
 			{
 				for(l=j-2;l<j+3;l++ )
 				{
-				  res = MAX(in->data[k][l],res);
+				  res = in->data[k][l] | res;
 				}
 			}
 			out->data[i][j] = res;
@@ -147,8 +147,8 @@ for(i=0;i<in->h;i++)
 		z = _mm_load_si128(&in->data[i+1][j]);
 	
 		//display_vuint8(x, "%d ", "X "); puts("");
-		res = _mm_min_epu8(x,y);
-		res = _mm_min_epu8(res,z);
+		res = _mm_and_si128(x,y);
+		res = _mm_and_si128(res,z);
 
 		//display_vuint8(res, "%d ", "res "); puts("");
 
@@ -172,9 +172,9 @@ for(i=0;i<in->h;i++)
 		z = _mm_load_si128(&in->data[i+1][j+1]);
 
 		
-		res2 = _mm_min_epu8(x,y);
+		res2 = _mm_and_si128(x,y);
 
-		res2 = _mm_min_epu8(res2,z);
+		res2 = _mm_and_si128(res2,z);
 		//display_vuint8(res2, "%d ", "z "); puts("");
 		
 		res2=_mm_bslli_si128(res2,15);
@@ -188,18 +188,18 @@ for(i=0;i<in->h;i++)
 		y = _mm_load_si128(&in->data[i][j-1]);
 		z = _mm_load_si128(&in->data[i+1][j-1]);
 		
-		res3 = _mm_min_epu8(x,y);
-		res3 = _mm_min_epu8(res3,z);
+		res3 = _mm_and_si128(x,y);
+		res3 = _mm_and_si128(res3,z);
 		//display_vuint8(res3, "%d ", "res  "); puts("");
 		res3=_mm_bsrli_si128(res3,15);
 		//display_vuint8(res3, "%d ", "res3 "); puts("");
 		res3 = _mm_or_si128(maskOR,res3);
 		//display_vuint8(res3, "%d ", "res4 "); puts("");
 
-		res = _mm_min_epu8(res,base1);
-		res = _mm_min_epu8(res,basem1);
-		res = _mm_min_epu8(res,res2);
-		res = _mm_min_epu8(res,res3);
+		res = _mm_and_si128(res,base1);
+		res = _mm_and_si128(res,basem1);
+		res = _mm_and_si128(res,res2);
+		res = _mm_and_si128(res,res3);
 
 		//display_vuint8(res, "%d ", "final "); puts("");
 
@@ -232,8 +232,8 @@ void morpho_SSE_Dilatation3_3(image_SSE* in, image_SSE* out)
 			z = _mm_load_si128(&in->data[i+1][j]);
 		
 			//display_vuint8(x, "%d ", "X "); puts("");
-			res = _mm_max_epu8(x,y);
-			res = _mm_max_epu8(res,z);
+			res = _mm_or_si128(x,y);
+			res = _mm_or_si128(res,z);
 
 			//display_vuint8(res, "%d ", "res "); puts("");
 
@@ -256,9 +256,9 @@ void morpho_SSE_Dilatation3_3(image_SSE* in, image_SSE* out)
 			y = _mm_load_si128(&in->data[i][j+1]);
 			z = _mm_load_si128(&in->data[i+1][j+1]);
 
-			res2 = _mm_max_epu8(x,y);
+			res2 = _mm_or_si128(x,y);
 
-			res2 = _mm_max_epu8(res2,z);
+			res2 = _mm_or_si128(res2,z);
 
 			//display_vuint8(res2, "%d ", "res2 "); puts("");
 			res2=_mm_bslli_si128(res2,15);
@@ -272,18 +272,18 @@ void morpho_SSE_Dilatation3_3(image_SSE* in, image_SSE* out)
 			y = _mm_load_si128(&in->data[i][j-1]);
 			z = _mm_load_si128(&in->data[i+1][j-1]);
 		
-			res3 = _mm_max_epu8(x,y);
-			res3 = _mm_max_epu8(res3,z);
+			res3 = _mm_or_si128(x,y);
+			res3 = _mm_or_si128(res3,z);
 			//display_vuint8(res3, "%d ", "res "); puts("");
 			res3=_mm_bsrli_si128(res3,15);
 			//display_vuint8(res3, "%d ", "res3 "); puts("");
 			res3 = _mm_and_si128(maskOR2,res3);
 			//display_vuint8(res3, "%d ", "res3 "); puts("");
 
-			res = _mm_max_epu8(res,base1);
-			res = _mm_max_epu8(res,basem1);
-			res = _mm_max_epu8(res,res2);
-			res = _mm_max_epu8(res,res3);
+			res = _mm_or_si128(res,base1);
+			res = _mm_or_si128(res,basem1);
+			res = _mm_or_si128(res,res2);
+			res = _mm_or_si128(res,res3);
 			//display_vuint8(res, "%d ", "final "); puts("");
 
 			_mm_store_si128(&out->data[i][j],res);
@@ -334,8 +334,8 @@ void morpho_SSE_Erosion5_5(image_SSE* in, image_SSE* out)
 		z = _mm_load_si128(&in->data[i+1][j]);
 	
 		//display_vuint8(x, "%d ", "X "); puts("");
-		res = _mm_min_epu8(x,y);
-		res = _mm_min_epu8(res,z);
+		res = _mm_and_si128(x,y);
+		res = _mm_and_si128(res,z);
 
 		//display_vuint8(res, "%d ", "res "); puts("");
 
@@ -367,9 +367,9 @@ void morpho_SSE_Erosion5_5(image_SSE* in, image_SSE* out)
 		z = _mm_load_si128(&in->data[i+1][j+1]);
 
 		
-		res2 = _mm_min_epu8(x,y);
+		res2 = _mm_and_si128(x,y);
 
-		res2 = _mm_min_epu8(res2,z);
+		res2 = _mm_and_si128(res2,z);
 		//display_vuint8(res2, "%d ", "z "); puts("");
 		
 		suivDec1=_mm_bslli_si128(res2,15);
@@ -385,8 +385,8 @@ void morpho_SSE_Erosion5_5(image_SSE* in, image_SSE* out)
 		y = _mm_load_si128(&in->data[i][j-1]);
 		z = _mm_load_si128(&in->data[i+1][j-1]);
 		
-		res3 = _mm_min_epu8(x,y);
-		res3 = _mm_min_epu8(res3,z);
+		res3 = _mm_and_si128(x,y);
+		res3 = _mm_and_si128(res3,z);
 		//display_vuint8(res3, "%d ", "res  "); puts("");
 
 
@@ -397,14 +397,14 @@ void morpho_SSE_Erosion5_5(image_SSE* in, image_SSE* out)
 		precDec2 = _mm_or_si128(maskOR2_255,precDec2);
 		//display_vuint8(res3, "%d ", "res4 "); puts("");
 
-		res = _mm_min_epu8(res,base1);
-		res = _mm_min_epu8(res,basem1);
-		res = _mm_min_epu8(res,base2);
-		res = _mm_min_epu8(res,basem2);
-		res = _mm_min_epu8(res,suivDec1);
-		res = _mm_min_epu8(res,suivDec2);
-		res = _mm_min_epu8(res,precDec1);
-		res = _mm_min_epu8(res,precDec2);
+		res = _mm_and_si128(res,base1);
+		res = _mm_and_si128(res,basem1);
+		res = _mm_and_si128(res,base2);
+		res = _mm_and_si128(res,basem2);
+		res = _mm_and_si128(res,suivDec1);
+		res = _mm_and_si128(res,suivDec2);
+		res = _mm_and_si128(res,precDec1);
+		res = _mm_and_si128(res,precDec2);
 		//display_vuint8(res, "%d ", "final "); puts("");
 
 		_mm_store_si128(&out->data[i][j],res);
@@ -440,8 +440,8 @@ void morpho_SSE_Dilatation5_5(image_SSE* in, image_SSE* out)
 		z = _mm_load_si128(&in->data[i+1][j]);
 	
 		//display_vuint8(x, "%d ", "X "); puts("");
-		res = _mm_max_epu8(x,y);
-		res = _mm_max_epu8(res,z);
+		res = _mm_or_si128(x,y);
+		res = _mm_or_si128(res,z);
 
 		//display_vuint8(res, "%d ", "res "); puts("");
 
@@ -473,9 +473,9 @@ void morpho_SSE_Dilatation5_5(image_SSE* in, image_SSE* out)
 		z = _mm_load_si128(&in->data[i+1][j+1]);
 
 		
-		res2 = _mm_max_epu8(x,y);
+		res2 = _mm_or_si128(x,y);
 
-		res2 = _mm_max_epu8(res2,z);
+		res2 = _mm_or_si128(res2,z);
 		//display_vuint8(res2, "%d ", "z "); puts("");
 		
 		suivDec1=_mm_bslli_si128(res2,15);
@@ -491,8 +491,8 @@ void morpho_SSE_Dilatation5_5(image_SSE* in, image_SSE* out)
 		y = _mm_load_si128(&in->data[i][j-1]);
 		z = _mm_load_si128(&in->data[i+1][j-1]);
 		
-		res3 = _mm_max_epu8(x,y);
-		res3 = _mm_max_epu8(res3,z);
+		res3 = _mm_or_si128(x,y);
+		res3 = _mm_or_si128(res3,z);
 		//display_vuint8(res3, "%d ", "res  "); puts("");
 
 
@@ -503,14 +503,14 @@ void morpho_SSE_Dilatation5_5(image_SSE* in, image_SSE* out)
 		precDec2 = _mm_and_si128(maskOR02,precDec2);
 		//display_vuint8(res3, "%d ", "res4 "); puts("");
 
-		res = _mm_max_epu8(res,base1);
-		res = _mm_max_epu8(res,basem1);
-		res = _mm_max_epu8(res,base2);
-		res = _mm_max_epu8(res,basem2);
-		res = _mm_max_epu8(res,suivDec1);
-		res = _mm_max_epu8(res,suivDec2);
-		res = _mm_max_epu8(res,precDec1);
-		res = _mm_max_epu8(res,precDec2);
+		res = _mm_or_si128(res,base1);
+		res = _mm_or_si128(res,basem1);
+		res = _mm_or_si128(res,base2);
+		res = _mm_or_si128(res,basem2);
+		res = _mm_or_si128(res,suivDec1);
+		res = _mm_or_si128(res,suivDec2);
+		res = _mm_or_si128(res,precDec1);
+		res = _mm_or_si128(res,precDec2);
 		//display_vuint8(res, "%d ", "final "); puts("");
 
 		_mm_store_si128(&out->data[i][j],res);

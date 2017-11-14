@@ -32,7 +32,6 @@ void initImageSSE(image_SSE* Image, int w, int h,int intensity)
     for(i=-2;i<Image->h+2;i++)
     {
     	Image->data[i] = vui8vector(vi0, vi1);
-
     }
 }
 
@@ -83,12 +82,12 @@ int readPGM_SSE(char* NomFichier, image_SSE* ImgRead)
 						tabLect[k] = fgetc(fp);
 						
 					}*/
-					fread(&x, sizeof(vuint8), 1, fp);
-					//x =_mm_set_epi8(fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),
-					//		fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),
-					//		fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp));
+					//fread(&x, sizeof(vuint8), 1, fp);
+					x =_mm_set_epi8(fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),
+						fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),
+						fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp));
 					_mm_store_si128(&ImgRead->data[i][j/16],x);
-
+				
 				}
 			}
 
@@ -351,27 +350,27 @@ void SD_1_Step_SSE(image_SSE* ImgRead, image_SSE* Ot, image_SSE* Vt, image_SSE* 
             sl = _mm_cmplt_epu8(mt, img_read);	// 0xFF si a < b ; 0 si a > b
             sg = _mm_cmpgt_epu8(mt, img_read);	// 0 si a < b; 0xFF si a > b
           	
-            mt = _mm_add_epi8_limit(mt, _mm_or_si128(_mm_and_si128(sg,valMax), zero)); 	// mt ADD ( (Sg ET 255) OR 0 ) 
-            mt = _mm_sub_epi8_limit(mt, _mm_or_si128(_mm_and_si128(sl,valMax), zero));	// mt SUB ( (Sl ET 255) OR 0 ) 
+            mt = _mm_add_epi8(mt, _mm_or_si128(_mm_and_si128(sg,valMax), zero)); 	// mt ADD ( (Sg ET 255) OR 0 ) 
+            mt = _mm_sub_epi8(mt, _mm_or_si128(_mm_and_si128(sl,valMax), zero));	// mt SUB ( (Sl ET 255) OR 0 ) 
 
 
            // STEP 2 // abs
            	max = _mm_max_epu8(mt, img_read);
            	min = _mm_min_epu8(mt, img_read);
             
-            ot = _mm_sub_epi8_limit(max, min);
+            ot = _mm_sub_epi8(max, min);
 
             // <=> N = 3  fonction _mm_mul = error
-            ot_bis = _mm_add_epi8_limit(ot, ot);
-            ot_bis = _mm_add_epi8_limit(ot_bis, ot);
+            ot_bis = _mm_add_epi8(ot, ot);
+            ot_bis = _mm_add_epi8(ot_bis, ot);
 
 			
            // STEP 3 
             sl = _mm_cmplt_epu8(vt, ot_bis);	//_mm_mul_epu32(n,ot));	// 0xFF si a < b ; 0 si a > b
             sg = _mm_cmpgt_epu8(vt, ot_bis);	//_mm_mul_epu32(n,ot));	// 0 si a < b; 0xFF si a > b
 
-            vt = _mm_add_epi8_limit(vt, _mm_or_si128(_mm_and_si128(sg,valMax), zero)); 	// mt ADD ( (Sl ET 255) OR 0 ) 
-            vt = _mm_sub_epi8_limit(vt, _mm_or_si128(_mm_and_si128(sl,valMax), zero));	// mt SUB ( (Sl ET 255) OR 0 ) 
+            vt = _mm_add_epi8(vt, _mm_or_si128(_mm_and_si128(sg,valMax), zero)); 	// mt ADD ( (Sl ET 255) OR 0 ) 
+            vt = _mm_sub_epi8(vt, _mm_or_si128(_mm_and_si128(sl,valMax), zero));	// mt SUB ( (Sl ET 255) OR 0 ) 
             
             vt = _mm_max_epu8(_mm_min_epu8(vt,vmax), vmin);
 
@@ -436,12 +435,14 @@ void SD_Full_Step_NO_Morpho_SSE()
 
 	readPGM_SSE("car3/car_3000.pgm",&ImageSSE1);
 	readPGM_SSE("car3/car_3001.pgm",&Mt);
+	//readPGM_SSE("car3/car_3000.pgm",&Vt);
 	
 
 
 	//initImageSSE(&ImageSSE2,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
 	initImageSSE(&Vt,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
 	initImageSSE(&Ot,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
+
 
 	for(i=0;i<199;i++){//199
 		//i=0;

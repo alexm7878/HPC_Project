@@ -1,5 +1,4 @@
 #include "mouvement_SSE2.h"
-#include "mouvement_SSE2.h"
 
 /* NOTES A MOI-MEME
 
@@ -42,7 +41,7 @@ int main(){
 	 _mm_max_epu8
 	 _mm_min_epu8
 
-*/
+
 	char oracle[6][36] = 
 		{
 			{0,0,0,0,0,0, 255,0,0,0,0,0, 255,255,0,0,0,0, 255,255,255,0,0,0, 255,255,255,255,0,0, 255,255,255,255,255,0},
@@ -73,7 +72,7 @@ int main(){
 	 test_cmplt =  _mm_cmplt_epu8(val, _254); 
 	 test_cmplt =  _mm_cmplt_epu8(val, _255); 
 
-*/
+
 
 	 test_cmplt  =  _mm_max_epu8(val, _255); 
 	 test_cmplt2 = _mm_sub_epi8_limit(val, _128);
@@ -84,7 +83,7 @@ int main(){
 	if(val_test_hexa[2] == 127)
 		printf("ok\n");
 	else printf("non ok\n" );
-*/
+
 	for(i = 0; i < 6; i++){ 
 		printf("%04hhx ", val_test_hexa[i]);
 	}
@@ -96,7 +95,22 @@ int main(){
 	}
 */
 
-	SD_Full_Step_NO_Morpho();
+//chrono(FD_Full_Step_Morpho3_3);
+//chrono(FD_Full_Step_Morpho3_3_SSE);
+
+	//SD_Full_Step_NO_Morpho();
+
+/*int MROC[2][2]={0,0,0,0};
+image_t image,verite;
+
+readPGM("SD/SDcar_99.pgm",&image);
+readPGM("Verite/car_100.pgm",&verite);
+	roc(&image,&verite,MROC);
+	displayROC(MROC);*/
+
+
+SD_Full_Step_NO_Morpho_SSE();
+SD_Full_Step_Morpho3_3_SSE();
 
 	return 0;
 }
