@@ -1,19 +1,18 @@
 #include "mouvement_SSE2.h"
 
-/* NOTES A MOI-MEME
-
-	add => pb si addition dépasse 255; retour au debut
-		ex : 255 + 1 = 0 / 255 + 2 = 1   pas de bit n3?  0xff + 0x01  = 0x00 et non 0x100
-
-	finir tableaux drive/oracle code
-
-	faire fonction comparaison
-*/
 
 
-int comparaion_verif(__m128i val_comp, char **oracle){
 
+
+void affichage(__m128i val){
+	int i;
+	uint8_t *val_test = (uint8_t *) &val;
+	
+	for(i = 0; i < 6; i++){ 
+		printf("%d ", val_test[i]);
+	}
 }
+
 
 int main(){
 
@@ -21,7 +20,7 @@ int main(){
 // INIT
 	vuint8 resul_test[16];
 	int i;
-	__m128i test_cmplt,test_cmplt2;
+	__m128i val_test,val_test2;
 	char *val_test_hexa, *val_test_hexa2;
 /*
  Rappel :
@@ -41,7 +40,8 @@ int main(){
 	 _mm_max_epu8
 	 _mm_min_epu8
 
-
+*/
+	 /*
 	char oracle[6][36] = 
 		{
 			{0,0,0,0,0,0, 255,0,0,0,0,0, 255,255,0,0,0,0, 255,255,255,0,0,0, 255,255,255,255,0,0, 255,255,255,255,255,0},
@@ -51,6 +51,8 @@ int main(){
 			{0,1,127,128,254,255, 1,1,127,128,254,255, 127,127,127,128,254,255, 128,128,128,128,254,255, 254,254,254,254,254,255, 255,255,255,255,255,255},
 			{0,0,0,0,0,0, 0,1,1,1,1,1, 0,1,127,127,127,127, 0,1,127,128,128,128, 0,1,127,128,254,254, 0,1,127,128,254,255}
 		 };
+
+	*/
 
 	__m128i val = _mm_setr_epi8(0, 1, 127, 128, 254, 255,0,0,0,0,0,0,0,0,0,0);
 
@@ -62,55 +64,119 @@ int main(){
 	__m128i _255= _mm_setr_epi8(255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255);
 
 
-//_mm_cmplt_epu8 // 0xFF si a < b ; 0 sinon
-	 /*
-	 test_cmplt =  _mm_cmplt_epu8(val, _127);
-	 //comparaion_verif(test_cmplt,oracle);
-	 test_cmplt =  _mm_cmplt_epu8(val, _1); 
-	 test_cmplt =  _mm_cmplt_epu8(val, _127); 
-	 test_cmplt =  _mm_cmplt_epu8(val, _128); 
-	 test_cmplt =  _mm_cmplt_epu8(val, _254); 
-	 test_cmplt =  _mm_cmplt_epu8(val, _255); 
+printf("val = 0, 1, 127, 128, 254, 255\n\n");
+
+//_mm_cmplt_epu8 
+	printf("===== Test _mm_cmplt_epu8 =====\n");
+	 val_test =  _mm_cmplt_epu8(val, _0);
+	 	printf("_mm_cmplt_epu8(val, _0) ");
+	 	affichage(val_test);
+	 	printf("\n");
+
+	 val_test =  _mm_cmplt_epu8(val, _1); 
+	 	printf("_mm_cmplt_epu8(val, _1) ");
+	 	affichage(val_test);
+	 	printf("\n");
+
+	 val_test =  _mm_cmplt_epu8(val, _127); 
+	 	printf("_mm_cmplt_epu8(val, _127) ");
+	 	affichage(val_test);
+	 	printf("\n");
+
+	 val_test =  _mm_cmplt_epu8(val, _128); 
+		printf("_mm_cmplt_epu8(val, _128) ");
+	 	affichage(val_test);
+	 	printf("\n");
+
+	 val_test =  _mm_cmplt_epu8(val, _254); 
+	 	printf("_mm_cmplt_epu8(val, _254) ");
+	 	affichage(val_test);
+	 	printf("\n");
+
+	 val_test =  _mm_cmplt_epu8(val, _255); 	 	
+	 	printf("_mm_cmplt_epu8(val, _255) ");
+	 	affichage(val_test);
+	 	printf("\n");
+
+ 	printf("\n");	
 
 
+//_mm_cmpgt_epu8 
+	 printf("===== Test _mm_cmpgt_epu8 =====\n");
+	 val_test =  _mm_cmpgt_epu8(val, _0);
+	 	printf("_mm_cmpgt_epu8(val, _0) ");
+	 	affichage(val_test);
+	 	printf("\n");
 
-	 test_cmplt  =  _mm_max_epu8(val, _255); 
-	 test_cmplt2 = _mm_sub_epi8_limit(val, _128);
-	// Affichage
-	val_test_hexa = (char *) &test_cmplt;
-	val_test_hexa2 = (char *) &test_cmplt2;
-/*
-	if(val_test_hexa[2] == 127)
-		printf("ok\n");
-	else printf("non ok\n" );
+	 val_test =  _mm_cmpgt_epu8(val, _1); 
+	 	printf("_mm_cmpgt_epu8(val, _1) ");
+	 	affichage(val_test);
+	 	printf("\n");
 
-	for(i = 0; i < 6; i++){ 
-		printf("%04hhx ", val_test_hexa[i]);
-	}
+	 val_test =  _mm_cmpgt_epu8(val, _127); 
+	 	printf("_mm_cmpgt_epu8(val, _127) ");
+	 	affichage(val_test);
+	 	printf("\n");
+
+	 val_test =  _mm_cmpgt_epu8(val, _128); 
+		printf("_mm_cmpgt_epu8(val, _128) ");
+	 	affichage(val_test);
+	 	printf("\n");
+
+	 val_test =  _mm_cmpgt_epu8(val, _254); 
+	 	printf("_mm_cmpgt_epu8(val, _254) ");
+	 	affichage(val_test);
+	 	printf("\n");
+
+	 val_test =  _mm_cmpgt_epu8(val, _255); 	 	
+	 	printf("_mm_cmpgt_epu8(val, _255) ");
+	 	affichage(val_test);
+	 	printf("\n");
+	 printf("\n");
+
+//_mm_add_epi8_limit
+	 printf("===== Test _mm_add_epi8_limit =====\n");
+	 val_test =  _mm_add_epi8_limit(val, _0);
+	 	printf("_mm_add_epi8_limit(val, _0) ");
+	 	affichage(val_test);
+	 	printf("\n");
+
+	 val_test =  _mm_add_epi8_limit(val, _1); 
+	 	printf("_mm_add_epi8_limit(val, _1) ");
+	 	affichage(val_test);
+	 	printf("\n");
+
+	 val_test =  _mm_add_epi8_limit(val, _127); 
+	 	printf("_mm_add_epi8_limit(val, _127) ");
+	 	affichage(val_test);
+	 	printf("\n");
+
+	 val_test =  _mm_add_epi8_limit(val, _128); 
+		printf("_mm_add_epi8_limit(val, _128) ");
+	 	affichage(val_test);
+	 	printf("\n");
+
+	 val_test =  _mm_add_epi8_limit(val, _254); 
+	 	printf("_mm_add_epi8_limit(val, _254) ");
+	 	affichage(val_test);
+	 	printf("\n");
+
+	 val_test =  _mm_add_epi8_limit(val, _255); 	 	
+	 	printf("_mm_add_epi8_limit(val, _255) ");
+	 	affichage(val_test);
+	 	printf("\n");
 
 	printf("\n");
-/*
-	for(i = 0; i < 6; i++){ 
-		printf("%04hhx ", val_test_hexa2[i]);
-	}
-*/
 
-//chrono(FD_Full_Step_Morpho3_3);
-//chrono(FD_Full_Step_Morpho3_3_SSE);
+// ......... suivant ..........
+// ..............
+// ............
+
+
+
 
 	//SD_Full_Step_NO_Morpho();
-
-/*int MROC[2][2]={0,0,0,0};
-image_t image,verite;
-
-readPGM("SD/SDcar_99.pgm",&image);
-readPGM("Verite/car_100.pgm",&verite);
-	roc(&image,&verite,MROC);
-	displayROC(MROC);*/
-
-
-SD_Full_Step_NO_Morpho_SSE();
-SD_Full_Step_Morpho3_3_SSE();
+	SD_Full_Step_NO_Morpho_SSE();
 
 	return 0;
 }
