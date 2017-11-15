@@ -292,7 +292,7 @@ void FD_Full_Step_Morpho3_3()
 
 		FD_1_Step(&ImgRead1,&ImgRead,&dif);
 
-		morpho_Erosion3_3(&dif,&out);
+		morpho_Dilatation3_3(&dif,&out);
 		//morpho_Dilatation3_3(&out,&dif);
 		//fermeture3_3(&dif,&inter,&out); // provoc des erreurs de sgmentation
 		writePGM(&out,i,"FD_Morpho3_3/FD_Morpho3_3_car_");

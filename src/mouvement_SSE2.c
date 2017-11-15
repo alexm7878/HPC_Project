@@ -247,9 +247,10 @@ void FD_Full_Step_Morpho3_3_SSE()
 
 		FD_1_Step_SSE(&ImageSSE1,&ImageSSE2,&Ot);
  
-		fermeture_SSE3_3(&Ot,&inter,&out);
-		ouverture_SSE3_3(&out,&inter,&Ot);
-		writePGM_SSE(&Ot,i,"FDSSE_Morpho3_3/FDSSEcar_");
+		//fermeture_SSE3_3(&Ot,&inter,&out);
+		//ouverture_SSE3_3(&out,&inter,&Ot);
+		morpho_SSE_Dilatation3_3(&Ot,&out);
+		writePGM_SSE(&out,i,"FDSSE_Morpho3_3/FDSSEcar_");
 	}
 
 	//printf("Fin FD sans morpho\n");

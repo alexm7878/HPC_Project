@@ -14,33 +14,33 @@ void affichage(__m128i val){
 }
 
 
-int main(){
-
+void test_unitaire_main()
+{
 
 // INIT
 	vuint8 resul_test[16];
 	int i;
 	__m128i val_test,val_test2;
 	char *val_test_hexa, *val_test_hexa2;
-/*
- Rappel :
- 	0 => 0x00
+	/*
+	 Rappel :
+	 	0 => 0x00
  	1 => 0x01
  	127 => 0x7F
  	128 => 0x80
  	254 => 0xFE
  	255 => 0xFF	
-*/
-/*
-// Oracle
-	 _mm_cmplt_epu8
-	 _mm_cmpgt_epu8
-	 _mm_add_epi8_limit
-	 _mm_sub_epi8_limit
-	 _mm_max_epu8
-	 _mm_min_epu8
+	*/
+	/*
+	// Oracle
+		 _mm_cmplt_epu8
+		 _mm_cmpgt_epu8
+		 _mm_add_epi8_limit
+		 _mm_sub_epi8_limit
+		 _mm_max_epu8
+		 _mm_min_epu8
 
-*/
+	*/
 	 /*
 	char oracle[6][36] = 
 		{
@@ -64,9 +64,9 @@ int main(){
 	__m128i _255= _mm_setr_epi8(255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255);
 
 
-printf("val = 0, 1, 127, 128, 254, 255\n\n");
+	printf("val = 0, 1, 127, 128, 254, 255\n\n");
 
-//_mm_cmplt_epu8 
+	//_mm_cmplt_epu8 
 	printf("===== Test _mm_cmplt_epu8 =====\n");
 	 val_test =  _mm_cmplt_epu8(val, _0);
 	 	printf("_mm_cmplt_epu8(val, _0) ");
@@ -101,7 +101,7 @@ printf("val = 0, 1, 127, 128, 254, 255\n\n");
  	printf("\n");	
 
 
-//_mm_cmpgt_epu8 
+	//_mm_cmpgt_epu8 
 	 printf("===== Test _mm_cmpgt_epu8 =====\n");
 	 val_test =  _mm_cmpgt_epu8(val, _0);
 	 	printf("_mm_cmpgt_epu8(val, _0) ");
@@ -134,7 +134,7 @@ printf("val = 0, 1, 127, 128, 254, 255\n\n");
 	 	printf("\n");
 	 printf("\n");
 
-//_mm_add_epi8_limit
+	//_mm_add_epi8_limit
 	 printf("===== Test _mm_add_epi8_limit =====\n");
 	 val_test =  _mm_add_epi8_limit(val, _0);
 	 	printf("_mm_add_epi8_limit(val, _0) ");
@@ -172,11 +172,35 @@ printf("val = 0, 1, 127, 128, 254, 255\n\n");
 // ..............
 // ............
 
+}
+
+int main(){
 
 
 
-	//SD_Full_Step_NO_Morpho();
-	SD_Full_Step_NO_Morpho_SSE();
+
+//test_unitaire_main();
+
+	//chrono_Difference_FD();
+	//chrono_Difference_morpho3_3_dilatation();
+
+	//chrono_Difference_morpho3_3_erosion();
+	//chrono_Difference_morpho5_5_erosion();
+	//chrono_Difference_morpho5_5_dilatation();
+	//chrono_Difference_SD();
+	FD_Full_Step_Morpho3_3_SSE();
+	FD_Full_Step_Morpho3_3();
+int MROC[2][2]={0,0,0,0};
+image_t image,verite,image2;
+
+readPGM("FDSSE_Morpho3_3/FDSSEcar_99.pgm",&image);
+readPGM("FD_Morpho3_3/FD_Morpho3_3_car_99.pgm",&image2);
+readPGM("Verite/car_100.pgm",&verite);
+	roc(&image,&verite,MROC);
+	displayROC(MROC);
+
+compareImage(&image,&image2);
+
 
 	return 0;
 }

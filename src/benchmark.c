@@ -1,5 +1,5 @@
 #include "benchmark.h"
-
+#include "mouvement.h"
 /*
  __inline__ uint64_t rdtsc(void)
    {
@@ -89,6 +89,377 @@ void chrono(void (*ptrfonction)(void))
 }
 
 
+void chronoFD()
+{
+    double t0,t1;
+    int i;
+    double freq ;
+    LitFrequenceCpu(&freq);
+
+   image_t ImageSSE1,ImageSSE2, Ot;
+    readPGM("car3/car_3100.pgm",&ImageSSE1);
+    readPGM("car3/car_3101.pgm",&ImageSSE2);
+    initImage_t(&Ot,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
+
+    t0= rdtsc();
+    //printf("il faut %f cycles\n",t0);
+
+    for(i=0;i<NRUN;i++)
+    {
+     FD_1_Step(&ImageSSE1, &ImageSSE2, &Ot);
+    }
+
+      t1= rdtsc();
+    //printf("il faut %f cycles\n",t1);
+      
+    printf(" total cycles : %f,\n   cycles par iteration : %f ,\n  cycles par image : %f ,\n  cycles par point : %f \n\n",(t1-t0),(t1-t0)/NRUN, (t1-t0)/ (NRUN), (t1-t0)/(NRUN*320*240));
+    printf(" total temps(ms) : %f ,\n  temps par iteration : %f ,\n  temps par image : %f ,\n  temps par pixel : %f \n\n",((t1-t0)/freq)*1000,((t1-t0)/(NRUN*freq))*1000, ((t1-t0)/ (NRUN*freq))*1000, ((t1-t0)/(NRUN*320*240* freq))*1000);
+}
+
+void chronoFD_SSE()
+{
+    double t0,t1;
+    int i;
+    double freq ;
+    LitFrequenceCpu(&freq);
+
+   image_SSE ImageSSE1,ImageSSE2, Ot;
+    readPGM_SSE("car3/car_3100.pgm",&ImageSSE1);
+    readPGM_SSE("car3/car_3101.pgm",&ImageSSE2);
+    initImageSSE(&Ot,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
+
+    t0= rdtsc();
+    //printf("il faut %f cycles\n",t0);
+
+    for(i=0;i<NRUN;i++)
+    {
+     FD_1_Step_SSE(&ImageSSE1, &ImageSSE2, &Ot);
+    }
+
+      t1= rdtsc();
+    //printf("il faut %f cycles\n",t1);
+      
+    printf(" total cycles : %f,\n   cycles par iteration : %f ,\n  cycles par image : %f ,\n  cycles par point : %f \n\n",(t1-t0),(t1-t0)/NRUN, (t1-t0)/ (NRUN), (t1-t0)/(NRUN*320*240));
+    printf(" total temps(ms) : %f ,\n  temps par iteration : %f ,\n  temps par image : %f ,\n  temps par pixel : %f \n\n",((t1-t0)/freq)*1000,((t1-t0)/(NRUN*freq))*1000, ((t1-t0)/ (NRUN*freq))*1000, ((t1-t0)/(NRUN*320*240*freq))*1000);
+}
+
+void chrono_Difference_FD()
+{
+  chronoFD();
+  chronoFD_SSE();
+}
+
+
+void chronoFD_morpho3_3_dilatation()
+{
+    double t0,t1;
+    int i;
+    double freq ;
+    LitFrequenceCpu(&freq);
+
+   image_t ImageSSE1,ImageSSE2;
+    readPGM("car3/car_3100.pgm",&ImageSSE1);
+    readPGM("car3/car_3101.pgm",&ImageSSE2);
+ 
+
+    t0= rdtsc();
+    //printf("il faut %f cycles\n",t0);
+
+    for(i=0;i<NRUN;i++)
+    {
+     morpho_Dilatation3_3(&ImageSSE1, &ImageSSE2);
+    }
+
+      t1= rdtsc();
+    //printf("il faut %f cycles\n",t1);
+      
+    printf(" total cycles : %f,\n   cycles par iteration : %f ,\n  cycles par image : %f ,\n  cycles par point : %f \n\n",(t1-t0),(t1-t0)/NRUN, (t1-t0)/ (NRUN), (t1-t0)/(NRUN*320*240));
+    printf(" total temps(ms) : %f ,\n  temps par iteration : %f ,\n  temps par image : %f ,\n  temps par pixel : %f \n\n",((t1-t0)/freq)*1000,((t1-t0)/(NRUN*freq))*1000, ((t1-t0)/ (NRUN*freq))*1000, ((t1-t0)/(NRUN*320*240*freq))*1000);
+}
+
+
+void chronoFD_morpho3_3_dilatation_SSE()
+{
+    double t0,t1;
+    int i;
+    double freq ;
+    LitFrequenceCpu(&freq);
+
+   image_SSE ImageSSE1,ImageSSE2;
+    readPGM_SSE("car3/car_3100.pgm",&ImageSSE1);
+    readPGM_SSE("car3/car_3101.pgm",&ImageSSE2);
+  
+
+    t0= rdtsc();
+    //printf("il faut %f cycles\n",t0);
+
+    for(i=0;i<NRUN;i++)
+    {
+      morpho_SSE_Dilatation3_3(&ImageSSE1, &ImageSSE2);
+    }
+
+      t1= rdtsc();
+    //printf("il faut %f cycles\n",t1);
+      
+    printf(" total cycles : %f,\n   cycles par iteration : %f ,\n  cycles par image : %f ,\n  cycles par point : %f \n\n",(t1-t0),(t1-t0)/NRUN, (t1-t0)/ (NRUN), (t1-t0)/(NRUN*320*240));
+    printf(" total temps(ms) : %f ,\n  temps par iteration : %f ,\n  temps par image : %f ,\n  temps par pixel : %f \n\n",((t1-t0)/freq)*1000,((t1-t0)/(NRUN*freq))*1000, ((t1-t0)/ (NRUN*freq))*1000, ((t1-t0)/(NRUN*320*240* freq))*1000);
+}
+
+void chrono_Difference_morpho3_3_dilatation()
+{
+  chronoFD_morpho3_3_dilatation();
+  chronoFD_morpho3_3_dilatation_SSE();
+}
+
+
+void chronoFD_morpho3_3_erosion()
+{
+    double t0,t1;
+    int i;
+    double freq ;
+    LitFrequenceCpu(&freq);
+
+   image_t ImageSSE1,ImageSSE2;
+    readPGM("car3/car_3100.pgm",&ImageSSE1);
+    readPGM("car3/car_3101.pgm",&ImageSSE2);
+ 
+
+    t0= rdtsc();
+    //printf("il faut %f cycles\n",t0);
+
+    for(i=0;i<NRUN;i++)
+    {
+     morpho_Erosion3_3(&ImageSSE1, &ImageSSE2);
+    }
+
+      t1= rdtsc();
+    //printf("il faut %f cycles\n",t1);
+      
+    printf(" total cycles : %f,\n   cycles par iteration : %f ,\n  cycles par image : %f ,\n  cycles par point : %f \n\n",(t1-t0),(t1-t0)/NRUN, (t1-t0)/ (NRUN), (t1-t0)/(NRUN*320*240));
+    printf(" total temps(ms) : %f ,\n  temps par iteration : %f ,\n  temps par image : %f ,\n  temps par pixel : %f \n\n",((t1-t0)/freq)*1000,((t1-t0)/(NRUN*freq))*1000, ((t1-t0)/ (NRUN*freq))*1000, ((t1-t0)/(NRUN*320*240*freq))*1000);
+}
+
+
+void chronoFD_morpho3_3_erosion_SSE()
+{
+    double t0,t1;
+    int i;
+    double freq ;
+    LitFrequenceCpu(&freq);
+
+   image_SSE ImageSSE1,ImageSSE2;
+    readPGM_SSE("car3/car_3100.pgm",&ImageSSE1);
+    readPGM_SSE("car3/car_3101.pgm",&ImageSSE2);
+  
+
+    t0= rdtsc();
+    //printf("il faut %f cycles\n",t0);
+
+    for(i=0;i<NRUN;i++)
+    {
+      morpho_SSE_Erosion3_3(&ImageSSE1, &ImageSSE2);
+    }
+
+      t1= rdtsc();
+    //printf("il faut %f cycles\n",t1);
+      
+    printf(" total cycles : %f,\n   cycles par iteration : %f ,\n  cycles par image : %f ,\n  cycles par point : %f \n\n",(t1-t0),(t1-t0)/NRUN, (t1-t0)/ (NRUN), (t1-t0)/(NRUN*320*240));
+    printf(" total temps(ms) : %f ,\n  temps par iteration : %f ,\n  temps par image : %f ,\n  temps par pixel : %f \n\n",((t1-t0)/freq)*1000,((t1-t0)/(NRUN*freq))*1000, ((t1-t0)/ (NRUN*freq))*1000, ((t1-t0)/(NRUN*320*240* freq))*1000);
+}
+
+void chrono_Difference_morpho3_3_erosion()
+{
+  chronoFD_morpho3_3_erosion();
+  chronoFD_morpho3_3_erosion_SSE();
+}
+
+
+void chronoFD_morpho5_5_erosion()
+{
+    double t0,t1;
+    int i;
+    double freq ;
+    LitFrequenceCpu(&freq);
+
+   image_t ImageSSE1,ImageSSE2;
+    readPGM("car3/car_3100.pgm",&ImageSSE1);
+    readPGM("car3/car_3101.pgm",&ImageSSE2);
+ 
+
+    t0= rdtsc();
+    //printf("il faut %f cycles\n",t0);
+
+    for(i=0;i<NRUN;i++)
+    {
+     morpho_Erosion5_5(&ImageSSE1, &ImageSSE2);
+    }
+
+      t1= rdtsc();
+    //printf("il faut %f cycles\n",t1);
+      
+    printf(" total cycles : %f,\n   cycles par iteration : %f ,\n  cycles par image : %f ,\n  cycles par point : %f \n\n",(t1-t0),(t1-t0)/NRUN, (t1-t0)/ (NRUN), (t1-t0)/(NRUN*320*240));
+    printf(" total temps(ms) : %f ,\n  temps par iteration : %f ,\n  temps par image : %f ,\n  temps par pixel : %f \n\n",((t1-t0)/freq)*1000,((t1-t0)/(NRUN*freq))*1000, ((t1-t0)/ (NRUN*freq))*1000, ((t1-t0)/(NRUN*320*240*freq))*1000);
+}
+
+
+void chronoFD_morpho5_5_erosion_SSE()
+{
+    double t0,t1;
+    int i;
+    double freq ;
+    LitFrequenceCpu(&freq);
+
+   image_SSE ImageSSE1,ImageSSE2;
+    readPGM_SSE("car3/car_3100.pgm",&ImageSSE1);
+    readPGM_SSE("car3/car_3101.pgm",&ImageSSE2);
+  
+
+    t0= rdtsc();
+    //printf("il faut %f cycles\n",t0);
+
+    for(i=0;i<NRUN;i++)
+    {
+      morpho_SSE_Erosion5_5(&ImageSSE1, &ImageSSE2);
+    }
+
+      t1= rdtsc();
+    //printf("il faut %f cycles\n",t1);
+      
+    printf(" total cycles : %f,\n   cycles par iteration : %f ,\n  cycles par image : %f ,\n  cycles par point : %f \n\n",(t1-t0),(t1-t0)/NRUN, (t1-t0)/ (NRUN), (t1-t0)/(NRUN*320*240));
+    printf(" total temps(ms) : %f ,\n  temps par iteration : %f ,\n  temps par image : %f ,\n  temps par pixel : %f \n\n",((t1-t0)/freq)*1000,((t1-t0)/(NRUN*freq))*1000, ((t1-t0)/ (NRUN*freq))*1000, ((t1-t0)/(NRUN*320*240* freq))*1000);
+}
+
+void chrono_Difference_morpho5_5_erosion()
+{
+  chronoFD_morpho5_5_erosion();
+  chronoFD_morpho5_5_erosion_SSE();
+}
+
+
+void chronoFD_morpho5_5_dilatation()
+{
+    double t0,t1;
+    int i;
+    double freq ;
+    LitFrequenceCpu(&freq);
+
+   image_t ImageSSE1,ImageSSE2;
+    readPGM("car3/car_3100.pgm",&ImageSSE1);
+    readPGM("car3/car_3101.pgm",&ImageSSE2);
+ 
+
+    t0= rdtsc();
+    //printf("il faut %f cycles\n",t0);
+
+    for(i=0;i<NRUN;i++)
+    {
+     morpho_Dilatation5_5(&ImageSSE1, &ImageSSE2);
+    }
+
+      t1= rdtsc();
+    //printf("il faut %f cycles\n",t1);
+      
+    printf(" total cycles : %f,\n   cycles par iteration : %f ,\n  cycles par image : %f ,\n  cycles par point : %f \n\n",(t1-t0),(t1-t0)/NRUN, (t1-t0)/ (NRUN), (t1-t0)/(NRUN*320*240));
+    printf(" total temps(ms) : %f ,\n  temps par iteration : %f ,\n  temps par image : %f ,\n  temps par pixel : %f \n\n",((t1-t0)/freq)*1000,((t1-t0)/(NRUN*freq))*1000, ((t1-t0)/ (NRUN*freq))*1000, ((t1-t0)/(NRUN*320*240*freq))*1000);
+}
+
+
+void chronoFD_morpho5_5_dilatation_SSE()
+{
+    double t0,t1;
+    int i;
+    double freq ;
+    LitFrequenceCpu(&freq);
+
+   image_SSE ImageSSE1,ImageSSE2;
+    readPGM_SSE("car3/car_3100.pgm",&ImageSSE1);
+    readPGM_SSE("car3/car_3101.pgm",&ImageSSE2);
+  
+
+    t0= rdtsc();
+    //printf("il faut %f cycles\n",t0);
+
+    for(i=0;i<NRUN;i++)
+    {
+      morpho_SSE_Dilatation5_5(&ImageSSE1, &ImageSSE2);
+    }
+
+      t1= rdtsc();
+    //printf("il faut %f cycles\n",t1);
+      
+    printf(" total cycles : %f,\n   cycles par iteration : %f ,\n  cycles par image : %f ,\n  cycles par point : %f \n\n",(t1-t0),(t1-t0)/NRUN, (t1-t0)/ (NRUN), (t1-t0)/(NRUN*320*240));
+    printf(" total temps(ms) : %f ,\n  temps par iteration : %f ,\n  temps par image : %f ,\n  temps par pixel : %f \n\n",((t1-t0)/freq)*1000,((t1-t0)/(NRUN*freq))*1000, ((t1-t0)/ (NRUN*freq))*1000, ((t1-t0)/(NRUN*320*240* freq))*1000);
+}
+
+void chrono_Difference_morpho5_5_dilatation()
+{
+  chronoFD_morpho5_5_dilatation();
+  chronoFD_morpho5_5_dilatation_SSE();
+}
+
+
+void chronoSD()
+{
+    double t0,t1;
+    int i;
+    double freq ;
+    LitFrequenceCpu(&freq);
+
+   image_t Mt,Vt, Ot,ImgRead;
+    readPGM("car3/car_3100.pgm",&ImgRead);
+    readPGM("car3/car_3101.pgm",&Mt);
+    readPGM("car3/car_3101.pgm",&Vt);
+    initImage_t(&Ot,ImgRead.w,ImgRead.h,ImgRead.maxInt);
+
+    t0= rdtsc();
+    //printf("il faut %f cycles\n",t0);
+
+    for(i=0;i<NRUN;i++)
+    {
+     SD_1_step(&ImgRead, &Ot, &Vt, &Mt);
+    }
+
+      t1= rdtsc();
+    //printf("il faut %f cycles\n",t1);
+      
+    printf(" total cycles : %f,\n   cycles par iteration : %f ,\n  cycles par image : %f ,\n  cycles par point : %f \n\n",(t1-t0),(t1-t0)/NRUN, (t1-t0)/ (NRUN), (t1-t0)/(NRUN*320*240));
+    printf(" total temps(ms) : %f ,\n  temps par iteration : %f ,\n  temps par image : %f ,\n  temps par pixel : %f \n\n",((t1-t0)/freq)*1000,((t1-t0)/(NRUN*freq))*1000, ((t1-t0)/ (NRUN*freq))*1000, ((t1-t0)/(NRUN*320*240* freq))*1000);
+}
+
+
+void chronoSD_SSE()
+{
+    double t0,t1;
+    int i;
+    double freq ;
+    LitFrequenceCpu(&freq);
+
+   image_SSE Mt,Vt, Ot,ImgRead;
+    readPGM_SSE("car3/car_3100.pgm",&ImgRead);
+    readPGM_SSE("car3/car_3101.pgm",&Mt);
+    readPGM_SSE("car3/car_3101.pgm",&Vt);
+    initImageSSE(&Ot,ImgRead.w,ImgRead.h,ImgRead.maxInt);
+
+    t0= rdtsc();
+    //printf("il faut %f cycles\n",t0);
+
+    for(i=0;i<NRUN;i++)
+    {
+       SD_1_Step_SSE(&ImgRead, &Ot, &Vt, &Mt);
+    }
+
+      t1= rdtsc();
+    //printf("il faut %f cycles\n",t1);
+      
+    printf(" total cycles : %f,\n   cycles par iteration : %f ,\n  cycles par image : %f ,\n  cycles par point : %f \n\n",(t1-t0),(t1-t0)/NRUN, (t1-t0)/ (NRUN), (t1-t0)/(NRUN*320*240));
+    printf(" total temps(ms) : %f ,\n  temps par iteration : %f ,\n  temps par image : %f ,\n  temps par pixel : %f \n\n",((t1-t0)/freq)*1000,((t1-t0)/(NRUN*freq))*1000, ((t1-t0)/ (NRUN*freq))*1000, ((t1-t0)/(NRUN*320*240*freq))*1000);
+}
+
+void chrono_Difference_SD()
+{
+  chronoSD();
+  chronoSD_SSE();
+}
 
 void main_Bench_FD()
 {
