@@ -188,20 +188,26 @@ int main(){
 	//chrono_Difference_morpho5_5_erosion();
 	//chrono_Difference_morpho5_5_dilatation();
 	//chrono_Difference_SD();
-	FD_Full_Step_Morpho3_3_SSE();
-	FD_Full_Step_Morpho3_3();
+
+
+
+
+	//FD_Full_Step_Morpho3_3_SSE();
+	//FD_Full_Step_Morpho3_3();
 int MROC[2][2]={0,0,0,0};
 image_t image,verite,image2;
 
-readPGM("FDSSE_Morpho3_3/FDSSEcar_99.pgm",&image);
-readPGM("FD_Morpho3_3/FD_Morpho3_3_car_99.pgm",&image2);
+readPGM("FDSSE_Morpho5_5/FDSSEcar_99.pgm",&image);
+readPGM("FD_Morpho5_5/FD_Morpho5_5_car_99.pgm",&image2);
 readPGM("Verite/car_100.pgm",&verite);
-	roc(&image,&verite,MROC);
-	displayROC(MROC);
+//	roc(&image,&verite,MROC);
+//	displayROC(MROC);
+	
 
-compareImage(&image,&image2);
 
+	//FD_Full_Step_Morpho5_5();
 
+	compareImage(&image,&image2);
 	return 0;
 }
 

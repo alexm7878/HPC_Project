@@ -22,14 +22,14 @@ void initImageSSE(image_SSE* Image, int w, int h,int intensity)
     s2v1D(si0, si1, card, &vi0, &vi1);
     v2m1D(vi0, vi1, card, &mi0, &mi1);*/
 
-    Image->data = vui8vectorArray(-2, Image->h+2);
+    Image->data = vui8vectorArray(-1, Image->h+1);
 
-    si0 = -2;
-    si1 = Image->w+2;
+    si0 = -1;
+    si1 = Image->w+1;
     s2v1D(si0, si1, card, &vi0, &vi1);
     v2m1D(vi0, vi1, card, &mi0, &mi1);
 
-    for(i=-2;i<Image->h+2;i++)
+    for(i=-1;i<Image->h+2;i++)
     {
     	Image->data[i] = vui8vector(vi0, vi1);
     }
@@ -249,7 +249,7 @@ void FD_Full_Step_Morpho3_3_SSE()
  
 		//fermeture_SSE3_3(&Ot,&inter,&out);
 		//ouverture_SSE3_3(&out,&inter,&Ot);
-		morpho_SSE_Dilatation3_3(&Ot,&out);
+		morpho_SSE_Dilatation3_3_reducColumn(&Ot,&out);
 		writePGM_SSE(&out,i,"FDSSE_Morpho3_3/FDSSEcar_");
 	}
 
@@ -293,7 +293,7 @@ void FD_Full_Step_Morpho5_5_SSE()
 
 		FD_1_Step_SSE(&ImageSSE1,&ImageSSE2,&Ot);
 
-		morpho_SSE_Dilatation5_5(&Ot,&out);
+		morpho_SSE_Erosion5_5(&Ot,&out);
 		writePGM_SSE(&out,i,"FDSSE_Morpho5_5/FDSSEcar_");
 	}
 
@@ -318,28 +318,37 @@ void cpySSE(image_SSE* in, image_SSE* out)
 }
 
 
+
+vuint8 conv_simd_logic_bin(vuint8 t)
+{
+
+    vuint8 _1 =_mm_set1_epi8(1);
+    t = (vuint8)_mm_min_epu8(t,_1);
+
+}
+
 void SD_1_Step_SSE(image_SSE* ImgRead, image_SSE* Ot, image_SSE* Vt, image_SSE* Mt) // manque la condition ==  dans le premier et deuxieme if
 {
 
-	int i,j;
-	int c =card_vuint8();
-	vuint8  mt,img_read,vt,	sl,sg,ot, ot_bis, max,min;
+    int i,j;
+    int c =card_vuint8();
+    vuint8  mt,img_read,vt, sl,sg,ot, ot_bis, max,min;
 
- 	vuint8 zero =_mm_set1_epi8(0);
- 	vuint8 valMax = _mm_set1_epi8(255);
- 	vuint8 vmax = _mm_set1_epi8(VMAX);
-	vuint8 vmin = _mm_set1_epi8(VMIN);
+    vuint8 zero =_mm_set1_epi8(0);
+    vuint8 valMax = _mm_set1_epi8(255);
+    vuint8 vmax = _mm_set1_epi8(VMAX);
+    vuint8 vmin = _mm_set1_epi8(VMIN);
 
-	for(i=0;i<ImgRead->h;i++){
-    	for(j=0;j<ImgRead->w/c;j++){
+    for(i=0;i<ImgRead->h;i++){
+        for(j=0;j<ImgRead->w/c;j++){
 
-    		//RAPPEL 
-    		// Vmax = 50	// define
-    		// Vmin = 30	// define
-    		// N = 3 		// par defaut, define ne modifira pas celui-ci
+            //RAPPEL 
+            // Vmax = 50    // define
+            // Vmin = 30    // define
+            // N = 3        // par defaut, define ne modifira pas celui-ci
 
-    	   // initialisation	
-        	mt = _mm_load_si128(&Mt->data[i][j]);
+           // initialisation    
+            mt = _mm_load_si128(&Mt->data[i][j]);
             vt = _mm_load_si128(&Vt->data[i][j]);
             img_read = _mm_load_si128(&ImgRead->data[i][j]);
 
@@ -347,32 +356,33 @@ void SD_1_Step_SSE(image_SSE* ImgRead, image_SSE* Ot, image_SSE* Vt, image_SSE* 
             //display_vuint8(img_read, "%d ", "ig0 "); puts("");
             //display_vuint8(vt, "%d ", "vt0 "); puts("");
 
-            // STEP 1	
-            sl = _mm_cmplt_epu8(mt, img_read);	// 0xFF si a < b ; 0 si a > b
-            sg = _mm_cmpgt_epu8(mt, img_read);	// 0 si a < b; 0xFF si a > b
-          	
-            mt = _mm_add_epi8(mt, _mm_or_si128(_mm_and_si128(sg,valMax), zero)); 	// mt ADD ( (Sg ET 255) OR 0 ) 
-            mt = _mm_sub_epi8(mt, _mm_or_si128(_mm_and_si128(sl,valMax), zero));	// mt SUB ( (Sl ET 255) OR 0 ) 
+            // STEP 1   
+            sl = _mm_cmplt_epu8(mt, img_read);  // 0xFF si a < b ; 0 si a > b
+            sg = _mm_cmpgt_epu8(mt, img_read);  // 0 si a < b; 0xFF si a > b
+			
+            // convert 255 en 1 logique
+            mt = _mm_add_epi8_limit(mt, conv_simd_logic_bin(_mm_or_si128(_mm_and_si128(sl,valMax), zero)));     // mt ADD ( (Sg ET 255) OR 0 ) 
+            mt = _mm_sub_epi8_limit(mt, conv_simd_logic_bin(_mm_or_si128(_mm_and_si128(sg,valMax), zero)));     // mt SUB ( (Sl ET 255) OR 0 ) 
 
 
            // STEP 2 // abs
-           	max = _mm_max_epu8(mt, img_read);
-           	min = _mm_min_epu8(mt, img_read);
-            
-            ot = _mm_sub_epi8(max, min);
+            max = _mm_max_epu8(mt, img_read);
+            min = _mm_min_epu8(mt, img_read);
+
+            ot = _mm_sub_epi8_limit(max, min);
 
             // <=> N = 3  fonction _mm_mul = error
-            ot_bis = _mm_add_epi8(ot, ot);
-            ot_bis = _mm_add_epi8(ot_bis, ot);
-
-			
-           // STEP 3 
-            sl = _mm_cmplt_epu8(vt, ot_bis);	//_mm_mul_epu32(n,ot));	// 0xFF si a < b ; 0 si a > b
-            sg = _mm_cmpgt_epu8(vt, ot_bis);	//_mm_mul_epu32(n,ot));	// 0 si a < b; 0xFF si a > b
-
-            vt = _mm_add_epi8(vt, _mm_or_si128(_mm_and_si128(sg,valMax), zero)); 	// mt ADD ( (Sl ET 255) OR 0 ) 
-            vt = _mm_sub_epi8(vt, _mm_or_si128(_mm_and_si128(sl,valMax), zero));	// mt SUB ( (Sl ET 255) OR 0 ) 
+            ot_bis = _mm_add_epi8_limit(ot, ot);
+            ot_bis = _mm_add_epi8_limit(ot_bis, ot);
             
+           // STEP 3 
+
+            sl = _mm_cmplt_epu8(vt, ot_bis);    //_mm_mul_epu32(n,ot)); // 0xFF si a < b ; 0 si a > b
+            sg = _mm_cmpgt_epu8(vt, ot_bis);    //_mm_mul_epu32(n,ot)); // 0 si a < b; 0xFF si a > b
+
+            vt = _mm_add_epi8_limit(vt, conv_simd_logic_bin(_mm_or_si128(_mm_and_si128(sg,valMax), zero)));     // mt ADD ( (Sl ET 255) OR 0 ) 
+            vt = _mm_sub_epi8_limit(vt, conv_simd_logic_bin(_mm_or_si128(_mm_and_si128(sl,valMax), zero))); // mt SUB ( (Sl ET 255) OR 0 ) 
+
             vt = _mm_max_epu8(_mm_min_epu8(vt,vmax), vmin);
 
            // STEP 4 
@@ -385,6 +395,7 @@ void SD_1_Step_SSE(image_SSE* ImgRead, image_SSE* Ot, image_SSE* Vt, image_SSE* 
         }
     }
 }
+
 
 
 

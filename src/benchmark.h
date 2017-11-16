@@ -42,4 +42,6 @@
 	void chronoSD_SSE();
 	void chrono_Difference_SD();
 
+	void chrono_morpho3_3_erosion_SSE_reducColumn();
+
 #endif
