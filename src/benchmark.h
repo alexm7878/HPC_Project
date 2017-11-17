@@ -24,24 +24,31 @@
 
 	void chronoFD_morpho3_3_dilatation();
 	void chronoFD_morpho3_3_dilatation_SSE();
+	void chrono_morpho3_3_dilatation_SSE_reducColumn();
 	void chrono_Difference_morpho3_3_dilatation();
 
 	void chronoFD_morpho3_3_erosion();
 	void chronoFD_morpho3_3_erosion_SSE();
+	void chrono_morpho3_3_erosion_SSE_reducColumn();
 	void chrono_Difference_morpho3_3_erosion();
 
 	void chronoFD_morpho5_5_erosion();
 	void chronoFD_morpho5_5_erosion_SSE();
+	void chronoFD_morpho5_5_erosion_SSE_reducColumn();
 	void chrono_Difference_morpho5_5_erosion();
 
 	void chronoFD_morpho5_5_dilatation();
 	void chronoFD_morpho5_5_dilatation_SSE();
+	void chronoFD_morpho5_5_dilatation_SSE_reducColumn();
 	void chrono_Difference_morpho5_5_dilatation();
 
 	void chronoSD();
 	void chronoSD_SSE();
 	void chrono_Difference_SD();
 
-	void chrono_morpho3_3_erosion_SSE_reducColumn();
+	
+	
+
+	
 
 #endif

@@ -177,7 +177,7 @@ void test_unitaire_main()
 int main(){
 
 
-
+FD_Full_Step_NO_Morpho();
 
 //test_unitaire_main();
 
@@ -192,9 +192,11 @@ int main(){
 
 
 
-	//FD_Full_Step_Morpho3_3_SSE();
-	//FD_Full_Step_Morpho3_3();
-int MROC[2][2]={0,0,0,0};
+	//FD_Full_Step_Morpho5_5_SSE();
+	//FD_Full_Step_Morpho5_5();
+	//chrono_Difference_morpho5_5_dilatation();
+
+/*int MROC[2][2]={0,0,0,0};
 image_t image,verite,image2;
 
 readPGM("FDSSE_Morpho5_5/FDSSEcar_99.pgm",&image);
@@ -207,7 +209,7 @@ readPGM("Verite/car_100.pgm",&verite);
 
 	//FD_Full_Step_Morpho5_5();
 
-	compareImage(&image,&image2);
+	compareImage(&image,&image2);*/
 	return 0;
 }
 

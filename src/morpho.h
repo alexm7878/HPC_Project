@@ -30,4 +30,7 @@
 
 	void morpho_SSE_Erosion3_3_reducColumn(image_SSE* in, image_SSE* out);
 	void morpho_SSE_Dilatation3_3_reducColumn(image_SSE* in, image_SSE* out);
+	void morpho_SSE_Erosion5_5_reducColumn(image_SSE* in, image_SSE* out);
+	void morpho_SSE_Dilatation5_5_reducColumn(image_SSE* in, image_SSE* out);
+	
 #endif

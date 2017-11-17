@@ -249,7 +249,7 @@ void FD_Full_Step_Morpho3_3_SSE()
  
 		//fermeture_SSE3_3(&Ot,&inter,&out);
 		//ouverture_SSE3_3(&out,&inter,&Ot);
-		morpho_SSE_Dilatation3_3_reducColumn(&Ot,&out);
+		morpho_SSE_Erosion3_3(&Ot,&out);
 		writePGM_SSE(&out,i,"FDSSE_Morpho3_3/FDSSEcar_");
 	}
 
@@ -293,7 +293,7 @@ void FD_Full_Step_Morpho5_5_SSE()
 
 		FD_1_Step_SSE(&ImageSSE1,&ImageSSE2,&Ot);
 
-		morpho_SSE_Erosion5_5(&Ot,&out);
+		morpho_SSE_Dilatation5_5(&Ot,&out);
 		writePGM_SSE(&out,i,"FDSSE_Morpho5_5/FDSSEcar_");
 	}
 

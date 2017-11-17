@@ -292,7 +292,7 @@ void FD_Full_Step_Morpho3_3()
 
 		FD_1_Step(&ImgRead1,&ImgRead,&dif);
 
-		morpho_Dilatation3_3(&dif,&out);
+		morpho_Erosion3_3(&dif,&out);
 		//morpho_Dilatation3_3(&out,&dif);
 		//fermeture3_3(&dif,&inter,&out); // provoc des erreurs de sgmentation
 		writePGM(&out,i,"FD_Morpho3_3/FD_Morpho3_3_car_");
@@ -329,8 +329,9 @@ void FD_Full_Step_Morpho5_5()
 			//printf("L'image a bien été lu\n ");
 
 		FD_1_Step(&ImgRead1,&ImgRead,&dif);
-		ouverture5_5(&dif,&inter,&out);
+		//ouverture5_5(&dif,&inter,&out);
 
+		morpho_Dilatation5_5(&dif,&out);
 		writePGM(&out,i,"FD_Morpho5_5/FD_Morpho5_5_car_");
 	}
 	//printf("Fin FD morpho 5_5\n");
