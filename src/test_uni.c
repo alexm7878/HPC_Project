@@ -176,10 +176,12 @@ void test_unitaire_main()
 
 int main(){
 
+//SD_Full_Step_Morpho5_5_SSE();
 
-FD_Full_Step_NO_Morpho();
+//FD_Full_Step_NO_Morpho();
 
 //test_unitaire_main();
+
 
 	//chrono_Difference_FD();
 	//chrono_Difference_morpho3_3_dilatation();

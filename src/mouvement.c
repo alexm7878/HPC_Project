@@ -28,20 +28,21 @@ uint8_t convBinToLogic(uint8_t t)
 }
 
 //Initialisation d'une variable image_t
-void initImage_t(image_t* Image, int w, int h,int intensity)
+void initImage_t(image_t* Image)
 {
 	int i,j;
-			//Image = (image_t*) malloc(sizeof(image_t));
-			Image->w = w;
-			Image->h=h;
-			Image->maxInt = intensity;
+			//image_t Image0;
+			//Image0 = (image_t*) malloc(sizeof(image_t));
+			Image->w = W;
+			Image->h=H;
+			Image->maxInt = INTENSITY;
 
 			//Allocation de la matrice 
-			Image->data =ui8matrix(-2,h+2,-2,w+2);
+			Image->data =ui8matrix(-2,H+2,-2,W+2);
 
-			for(i=-2;i<h+3;i++)
+			for(i=-2;i<H+3;i++)
 			{
-				for(j=-2; j<w+3;j++)
+				for(j=-2; j<W+3;j++)
 				{
 					Image->data[i][j] = 0;
 				}
@@ -51,8 +52,7 @@ void initImage_t(image_t* Image, int w, int h,int intensity)
 void freeImage_t(image_t* Image)
 {
 		free_ui8matrix(Image->data,-2,Image->h+2,-2,Image->w+2);
-
-		free(Image);
+		//free(Image);
 }
 
 
@@ -91,12 +91,12 @@ int readPGM(char* NomFichier, image_t* ImgRead)
 
 
 			//initialisation de l'image
-			initImage_t(ImgRead,w,h,intensity);
+			initImage_t(ImgRead);
 
 			//Lecture de chacune des valeurs 
-			for(i=0;i<ImgRead->h;i++)
+			for(i=0;i<H;i++)
 			{
-				for(j=0;j<ImgRead->w;j++)
+				for(j=0;j<W;j++)
 					ImgRead->data[i][j] =fgetc(fp);
 			}
 			fclose(fp);
@@ -115,18 +115,18 @@ int readPGM(char* NomFichier, image_t* ImgRead)
 void FD_1_Step(image_t* ImgRead1, image_t* ImgRead, image_t* dif)
 {
 	int i,j;
-	for(i=0;i<dif->h;i++)
+	for(i=0;i<H;i++)
 	{
-		for(j=0;j<dif->w;j++)
+		for(j=0;j<W;j++)
 		{
 			dif->data[i][j] = fabs(ImgRead1->data[i][j] - ImgRead->data[i][j]);
 		
 
 		}
 	}
-	for(i=0;i<dif->h;i++)
+	for(i=0;i<H;i++)
 	{
-		for(j=0;j<dif->w;j++)
+		for(j=0;j<W;j++)
 		{
 			if(dif->data[i][j] < TETA )
 				dif->data[i][j] = 0;
@@ -158,9 +158,9 @@ void cpy_Image(image_t* Mt, image_t* ImgRead)//********************* AJOUT
 {
 	int i,j;
 
-	for(i=0;i<Mt->h;i++)
+	for(i=0;i<H;i++)
 	{
-		for(j=0;j<Mt->w;j++)
+		for(j=0;j<W;j++)
 		{
 			Mt->data[i][j] = ImgRead->data[i][j];
 		}
@@ -184,9 +184,9 @@ void writePGM(image_t* dif, int k, char* dossier)
 		fprintf(fp,"%d %d\n",dif->w,dif->h);
 		fprintf(fp,"%d\n",dif->maxInt);
 
-		for(i=0;i<dif->h;i++)
+		for(i=0;i<H;i++)
 		{
-			for(j=0;j<dif->w;j++)
+			for(j=0;j<W;j++)
 			{
 				fprintf(fp,"%c",dif->data[i][j]);
 			}
@@ -214,9 +214,9 @@ void writePPM(image_t* dif, int k, char* dossier)
 		fprintf(fp,"%d %d\n",dif->w,dif->h);
 		fprintf(fp,"%d\n",dif->maxInt);
 
-		for(i=0;i<dif->h;i++)
+		for(i=0;i<H;i++)
 		{
-			for(j=0;j<dif->w;j++)
+			for(j=0;j<W;j++)
 			{
 				fprintf(fp,"%c",dif->data[i][j]);
 				fprintf(fp,"%c",dif->data[i][j]);
@@ -240,9 +240,9 @@ void FD_Full_Step_NO_Morpho()
 	char nomFichier[50] ="";
 	char nomFichier2[50] ="";
 
-	readPGM("car3/car_3000.pgm",&ImgRead);
+	//readPGM("car3/car_3000.pgm",&ImgRead);
 		
-	initImage_t(&dif,ImgRead.w,ImgRead.h,ImgRead.maxInt);
+	initImage_t(&dif);
 
 
 
@@ -257,9 +257,13 @@ void FD_Full_Step_NO_Morpho()
 
 		FD_1_Step(&ImgRead1,&ImgRead,&dif);
 		writePGM(&dif,i,"FD/FDcar_");
+
+		freeImage_t(&ImgRead);
+		freeImage_t(&ImgRead1);
 	}
 	//printf("Fin FD sans morpho\n");
-	//freeImage_t(&ImgRead);
+	
+	freeImage_t(&dif);
 }
 
 void FD_Full_Step_Morpho3_3()
@@ -271,14 +275,11 @@ void FD_Full_Step_Morpho3_3()
 	int i;
 
 	char nomFichier[50]="";
-	char nomFichier2[50]="";
+	char nomFichier2[50]="";		
 
-	readPGM("car3/car_3000.pgm",&ImgRead);
-		
-
-	initImage_t(&dif,ImgRead.w,ImgRead.h,ImgRead.maxInt);
-	initImage_t(&inter,ImgRead.w,ImgRead.h,ImgRead.maxInt);
-	initImage_t(&out,ImgRead.w,ImgRead.h,ImgRead.maxInt);
+	initImage_t(&dif);
+	initImage_t(&inter);
+	initImage_t(&out);
 
 
 	for(i=0;i<199;i++){
@@ -296,7 +297,14 @@ void FD_Full_Step_Morpho3_3()
 		//morpho_Dilatation3_3(&out,&dif);
 		//fermeture3_3(&dif,&inter,&out); // provoc des erreurs de sgmentation
 		writePGM(&out,i,"FD_Morpho3_3/FD_Morpho3_3_car_");
+
+		freeImage_t(&ImgRead);
+		freeImage_t(&ImgRead1);
 	}
+	freeImage_t(&dif);
+	freeImage_t(&inter);
+	freeImage_t(&out);
+
 	//printf("Fin FD morpho 3_3\n");
 }
 
@@ -311,12 +319,10 @@ void FD_Full_Step_Morpho5_5()
 	char nomFichier[50];
 	char nomFichier2[50];
 
-	readPGM("car3/car_3000.pgm",&ImgRead);
-		
-
-	initImage_t(&dif,ImgRead.w,ImgRead.h,ImgRead.maxInt);
-	initImage_t(&out,ImgRead.w,ImgRead.h,ImgRead.maxInt);
-	initImage_t(&inter,ImgRead.w,ImgRead.h,ImgRead.maxInt);
+	
+	initImage_t(&dif);
+	initImage_t(&out);
+	initImage_t(&inter);
 
 
 	for(i=0;i<199;i++){
@@ -333,7 +339,13 @@ void FD_Full_Step_Morpho5_5()
 
 		morpho_Dilatation5_5(&dif,&out);
 		writePGM(&out,i,"FD_Morpho5_5/FD_Morpho5_5_car_");
+
+		freeImage_t(&ImgRead);
+		freeImage_t(&ImgRead1);
 	}
+	freeImage_t(&dif);
+	freeImage_t(&inter);
+	freeImage_t(&out);
 	//printf("Fin FD morpho 5_5\n");
 }
 
@@ -341,9 +353,9 @@ void SD_1_step(image_t* ImgRead, image_t* Ot, image_t* Vt, image_t* Mt)
 {
 	 int i,j;
 
-        for(i=0;i<ImgRead->h;i++)
+        for(i=0;i<H;i++)
         {
-                for(j=0;j<ImgRead->w;j++)
+                for(j=0;j<W;j++)
                 {
                         if(Mt->data[i][j] < ImgRead->data[i][j])
                                 Mt->data[i][j] = Mt->data[i][j] +1;
@@ -353,9 +365,9 @@ void SD_1_step(image_t* ImgRead, image_t* Ot, image_t* Vt, image_t* Mt)
                         Ot->data[i][j] = fabs(Mt->data[i][j] - ImgRead->data[i][j]);
                     }
                 }
-         for(i=0;i<ImgRead->h;i++)
+         for(i=0;i<H;i++)
         {
-                for(j=0;j<ImgRead->w;j++)
+                for(j=0;j<W;j++)
                 {
 
 
@@ -369,9 +381,9 @@ void SD_1_step(image_t* ImgRead, image_t* Ot, image_t* Vt, image_t* Mt)
                 Vt->data[i][j] = MAX(MIN(Vt->data[i][j],VMAX),VMIN);
             }
         }
-        for(i=0;i<ImgRead->h;i++)
+        for(i=0;i<H;i++)
         {
-                for(j=0;j<ImgRead->w;j++)
+                for(j=0;j<W;j++)
                 {
 
                 if(Ot->data[i][j]< Vt->data[i][j])
@@ -387,9 +399,9 @@ void setVal_image(image_t* img, int val)
 {
 
 	int i,j;
-	for(i=0;i<img->h;i++)
+	for(i=0;i<H;i++)
 	{
-		for(j=0;j<img->w;j++)
+		for(j=0;j<W;j++)
 		{
 			img->data[i][j] = val;
 		}
@@ -403,12 +415,11 @@ void SD_Full_Step_NO_Morpho()
         int k;
         char nomFichier[50];
 
-        readPGM("car3/car_3000.pgm",&ImgRead);
 
-        initImage_t(&Ot,ImgRead.w,ImgRead.h,ImgRead.maxInt);
-        initImage_t(&Vt,ImgRead.w,ImgRead.h,ImgRead.maxInt);
-
-        readPGM("car3/car_3001.pgm",&Mt);
+        initImage_t(&Ot);
+        initImage_t(&Vt);
+        //initImage_t(&Mt);
+         readPGM("car3/car_3001.pgm",&Mt);
 
 		setVal_image(&Vt,VMIN);
 
@@ -420,7 +431,13 @@ void SD_Full_Step_NO_Morpho()
 
 
                 writePGM(&Ot,k,"SD/SDcar_");
+
+        freeImage_t(&ImgRead);
+		
         }
+        freeImage_t(&Ot);
+        freeImage_t(&Vt);
+        freeImage_t(&Mt);
         //printf("FIN SD sans Morpho\n");
 }
 
@@ -431,12 +448,10 @@ void SD_Full_Step_Morpho3_3()
         int k;
         char nomFichier[50];
 
-        readPGM("car3/car_3000.pgm",&ImgRead);
-
-        initImage_t(&Ot,ImgRead.w,ImgRead.h,ImgRead.maxInt);
-        initImage_t(&Vt,ImgRead.w,ImgRead.h,ImgRead.maxInt);
-        initImage_t(&inter,ImgRead.w,ImgRead.h,ImgRead.maxInt);
-         initImage_t(&out,ImgRead.w,ImgRead.h,ImgRead.maxInt);
+        initImage_t(&Ot);
+        initImage_t(&Vt);
+        initImage_t(&inter);
+         initImage_t(&out);
 
         readPGM("car3/car_3001.pgm",&Mt);
 
@@ -445,10 +460,8 @@ void SD_Full_Step_Morpho3_3()
         for(k=0;k<199;k++){
                 Conc("car3/car_",3000+k,nomFichier);
 
-
                 readPGM(nomFichier,&ImgRead);
                 SD_1_step(&ImgRead, &Ot, &Vt, &Mt);
-
 
                 //fermeture3_3(&Ot,&inter,&out);
                 //ouverture3_3(&out,&inter,&Ot);
@@ -456,10 +469,15 @@ void SD_Full_Step_Morpho3_3()
                //ouverture3_3(&Ot,&inter,&out);
               	fermeture3_3(&Ot,&inter,&out);
 
-                
-
                 writePGM(&out,k,"SD_Morpho3_3/SDcar3_3_");
+                 freeImage_t(&ImgRead);
         }
+
+         freeImage_t(&Ot);
+         freeImage_t(&Vt);
+         freeImage_t(&inter);
+         freeImage_t(&out);
+         freeImage_t(&Mt);
         //printf("FIN SD Morpho 3_3\n");
 }
 
@@ -472,10 +490,10 @@ void SD_Full_Step_Morpho5_5()
 
         readPGM("car3/car_3000.pgm",&ImgRead);
 
-        initImage_t(&Ot,ImgRead.w,ImgRead.h,ImgRead.maxInt);
-        initImage_t(&Vt,ImgRead.w,ImgRead.h,ImgRead.maxInt);
-        initImage_t(&inter,ImgRead.w,ImgRead.h,ImgRead.maxInt);
-         initImage_t(&out,ImgRead.w,ImgRead.h,ImgRead.maxInt);
+        initImage_t(&Ot);
+        initImage_t(&Vt);
+        initImage_t(&inter);
+         initImage_t(&out);
 
         readPGM("car3/car_3001.pgm",&Mt);
 
@@ -497,7 +515,15 @@ void SD_Full_Step_Morpho5_5()
                 
 
                 writePGM(&Ot,k,"SD_Morpho5_5/SDcar5_5_");
+                freeImage_t(&ImgRead);
         }
+
+        freeImage_t(&Ot);
+        freeImage_t(&out);
+        freeImage_t(&inter);
+        freeImage_t(&Vt);
+        freeImage_t(&Mt);
+
       //  printf("FIN SD Morpho 5_5\n");
 }
 
@@ -507,9 +533,9 @@ void compareImage(image_t* image1, image_t* image2)
     int i,j;
     int cpt=0;
 
-    for(i=0;i<image1->h;i++)
+    for(i=0;i<H;i++)
     {
-        for(j=0;j<image1->w;j++)
+        for(j=0;j<W;j++)
         {
             if(image1->data[i][j] == image2->data[i][j])
             {

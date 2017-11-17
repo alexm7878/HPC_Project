@@ -14,7 +14,9 @@
 	#include "vnrdef.h"
 	#include "nrutil.h"
 
-
+	#define H 240
+	#define W 320
+	#define INTENSITY 255
 
 	#define TETA 21
 		
@@ -40,7 +42,7 @@
 
 	uint8_t convLogicToBin(uint8_t t);
 	uint8_t convBinToLogic(uint8_t t);
-	void initImage_t(image_t* Image, int w, int h,int intensity);
+	void initImage_t(image_t* Image);
 	void freeImage_t(image_t* Image);
 	int readPGM(char* NomFichier, image_t* ImgRead);
 	void FD_1_Step(image_t* ImgRead1, image_t* ImgRead, image_t* dif);

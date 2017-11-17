@@ -229,6 +229,7 @@ void free_vui8vector(vuint8 *v, int nl, int nh)
 {
     _mm_free(v+nl);
 }
+
 /* ----------------------------------------- */
 void free_vsi8vector(vsint8 *v, int nl, int nh)
 /* ----------------------------------------- */

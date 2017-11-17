@@ -3,12 +3,12 @@
 
 
 
-void initImageSSE(image_SSE* Image, int w, int h,int intensity)
+void initImageSSE(image_SSE* Image)
 {
 	int i,j;
-	Image->w = w;
-	Image->h=h;
-	Image->maxInt = intensity;
+	Image->w = W;
+	Image->h=H;
+	Image->maxInt = INTENSITY;
 
 	int card;
   	int si0, si1; // scalar indices
@@ -17,22 +17,31 @@ void initImageSSE(image_SSE* Image, int w, int h,int intensity)
 
  	card = card_vuint8();
 
- 	/*si0 = 0;
-    si1 = Image->h -1;
-    s2v1D(si0, si1, card, &vi0, &vi1);
-    v2m1D(vi0, vi1, card, &mi0, &mi1);*/
-
-    Image->data = vui8vectorArray(-1, Image->h+1);
+    Image->data = vui8vectorArray(-1, H+1);
 
     si0 = -1;
-    si1 = Image->w+1;
+    si1 = W+1;
     s2v1D(si0, si1, card, &vi0, &vi1);
     v2m1D(vi0, vi1, card, &mi0, &mi1);
 
-    for(i=-1;i<Image->h+2;i++)
+    for(i=-1;i<H+2;i++)
     {
     	Image->data[i] = vui8vector(vi0, vi1);
     }
+}
+
+void freeImageSSE(image_SSE* image)
+{
+
+	int i,j;
+
+	for(i=-1;i<H+2;i++)
+	{
+		free_vui8vector(image->data[i], -1, W/16);
+	}
+
+	free(image->data -1 );
+	//free_vui8vector(image->data, -1, H+1);
 }
 
 int readPGM_SSE(char* NomFichier, image_SSE* ImgRead)
@@ -71,7 +80,7 @@ int readPGM_SSE(char* NomFichier, image_SSE* ImgRead)
 
 
 			//initialisation de l'image
-			initImageSSE(ImgRead,w,h,intensity);
+			initImageSSE(ImgRead);
 
 			//Lecture de chacune des valeurs 
 			for(i=0;i<ImgRead->h;i++)
@@ -109,9 +118,9 @@ void copyImage_t_to_Image_SSE(image_t* imaget, image_SSE* imageSSE)
 	int i,j,k;
 	vuint8 x;
 	int c = card_vuint8();
-	for(i=0;i<imaget->h;i++)
+	for(i=0;i<H;i++)
 		{
-			for(j=0;j<imaget->w;j+=c)
+			for(j=0;j<W;j+=c)
 			{
 						x =_mm_set_epi8(imaget->data[i][j+15],imaget->data[i][j+14],imaget->data[i][j+13],imaget->data[i][j+12],imaget->data[i][j+11],
 							imaget->data[i][j+10],imaget->data[i][j+9],imaget->data[i][j+8],imaget->data[i][j+7],imaget->data[i][j+6],imaget->data[i][j+5],imaget->data[i][j+4],
@@ -128,9 +137,9 @@ void copyImage_SSE_to_Image_t(image_SSE* imageSSE,image_t* imaget)
 	vuint8 T[1];
 	uint8 *p = (uint8*) T;
 	int c = card_vuint8();
-	for(i=0;i<imaget->h;i++)
+	for(i=0;i<H;i++)
 		{
-			for(j=0;j<imaget->w;j+=c)
+			for(j=0;j<W;j+=c)
 			{
 				 _mm_store_si128(T,imageSSE->data[i][j/c]);
 				 for(k=0;k<c;k++)
@@ -151,8 +160,8 @@ void FD_1_Step_SSE(image_SSE* ImageSSE1, image_SSE* ImageSSE2, image_SSE* Ot)
  	valMax = _mm_set1_epi8(255);
 	teta = _mm_set1_epi8(TETA);	// 20	// define
 
-	for(i=0;i<ImageSSE1->h;i++){
-		for(j=0;j<ImageSSE1->w/c;j++){
+	for(i=0;i<H;i++){
+		for(j=0;j<W/c;j++){
 
 			// initialisation
 			it = _mm_load_si128(&ImageSSE2->data[i][j]);
@@ -185,12 +194,8 @@ void FD_Full_Step_NO_Morpho_SSE()
 
 	image_SSE ImageSSE1,ImageSSE2, Ot;
 
-	readPGM_SSE("car3/car_3000.pgm",&ImageSSE1);
-	//readPGM("car3/car_3000.pgm",&ImgRead);
 
- 	//initImageSSE(&ImageSSE1,ImgRead.w,ImgRead.h,ImgRead.maxInt);
-	initImageSSE(&ImageSSE2,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
-	initImageSSE(&Ot,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
+	initImageSSE(&Ot);
 
 	for(i=0;i<199;i++){
 		Conc("car3/car_",3000+i,nomFichier);
@@ -206,8 +211,13 @@ void FD_Full_Step_NO_Morpho_SSE()
 		//copyImage_SSE_to_Image_t(&dif,&ImgRead);
 		//writePGM(&ImgRead,i,"FDSSE/FDSSEcar_");
 		writePGM_SSE(&Ot,i,"FDSSE/FDSSEcar_");
+
+		freeImageSSE(&ImageSSE1);
+		freeImageSSE(&ImageSSE2);
+
 	}
 
+	freeImageSSE(&Ot);
 	//printf("Fin FD sans morpho\n");
 	//freeImage_t(&ImgRead);
 	//freeImageSSE(&ImageSSE1);
@@ -227,14 +237,9 @@ void FD_Full_Step_Morpho3_3_SSE()
 
 	image_SSE ImageSSE1,ImageSSE2, Ot, out, inter;
 
-	readPGM_SSE("car3/car_3000.pgm",&ImageSSE1);
-	//readPGM("car3/car_3000.pgm",&ImgRead);
-
- 	//initImageSSE(&ImageSSE1,ImgRead.w,ImgRead.h,ImgRead.maxInt);
-	initImageSSE(&ImageSSE2,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
-	initImageSSE(&Ot,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
-	initImageSSE(&out,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
-	initImageSSE(&inter,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
+	initImageSSE(&Ot);
+	initImageSSE(&out);
+	initImageSSE(&inter);
 
 	for(i=0;i<199;i++){
 		Conc("car3/car_",3000+i,nomFichier);
@@ -251,7 +256,14 @@ void FD_Full_Step_Morpho3_3_SSE()
 		//ouverture_SSE3_3(&out,&inter,&Ot);
 		morpho_SSE_Erosion3_3(&Ot,&out);
 		writePGM_SSE(&out,i,"FDSSE_Morpho3_3/FDSSEcar_");
+
+		freeImageSSE(&ImageSSE1);
+		freeImageSSE(&ImageSSE2);
 	}
+
+	freeImageSSE(&Ot);
+	freeImageSSE(&out);
+	freeImageSSE(&inter);
 
 	//printf("Fin FD sans morpho\n");
 	//freeImage_t(&ImgRead);
@@ -273,14 +285,10 @@ void FD_Full_Step_Morpho5_5_SSE()
 
 	image_SSE ImageSSE1,ImageSSE2, Ot, out, inter;
 
-	readPGM_SSE("car3/car_3000.pgm",&ImageSSE1);
-	//readPGM("car3/car_3000.pgm",&ImgRead);
-
- 	//initImageSSE(&ImageSSE1,ImgRead.w,ImgRead.h,ImgRead.maxInt);
-	initImageSSE(&ImageSSE2,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
-	initImageSSE(&Ot,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
-	initImageSSE(&out,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
-	initImageSSE(&inter,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
+	
+	initImageSSE(&Ot);
+	initImageSSE(&out);
+	initImageSSE(&inter);
 
 	for(i=0;i<199;i++){
 		Conc("car3/car_",3000+i,nomFichier);
@@ -295,8 +303,14 @@ void FD_Full_Step_Morpho5_5_SSE()
 
 		morpho_SSE_Dilatation5_5(&Ot,&out);
 		writePGM_SSE(&out,i,"FDSSE_Morpho5_5/FDSSEcar_");
+
+		freeImageSSE(&ImageSSE1);
+		freeImageSSE(&ImageSSE2);
 	}
 
+	freeImageSSE(&Ot);
+	freeImageSSE(&out);
+	freeImageSSE(&inter);
 	//printf("Fin FD sans morpho\n");
 	//freeImage_t(&ImgRead);
 	//freeImageSSE(&ImageSSE1);
@@ -308,9 +322,9 @@ void cpySSE(image_SSE* in, image_SSE* out)
 {
 
 	int i,j;
-	for(i=0;i<in->h;i++)
+	for(i=0;i<H;i++)
 	{
-		for(j=0;j<in->w/16;j++)
+		for(j=0;j<W/16;j++)
 		{
 			_mm_store_si128(&out->data[i][j],in->data[i][j]);
 		}
@@ -321,7 +335,6 @@ void cpySSE(image_SSE* in, image_SSE* out)
 
 vuint8 conv_simd_logic_bin(vuint8 t)
 {
-
     vuint8 _1 =_mm_set1_epi8(1);
     t = (vuint8)_mm_min_epu8(t,_1);
 
@@ -339,8 +352,8 @@ void SD_1_Step_SSE(image_SSE* ImgRead, image_SSE* Ot, image_SSE* Vt, image_SSE* 
     vuint8 vmax = _mm_set1_epi8(VMAX);
     vuint8 vmin = _mm_set1_epi8(VMIN);
 
-    for(i=0;i<ImgRead->h;i++){
-        for(j=0;j<ImgRead->w/c;j++){
+    for(i=0;i<H;i++){
+        for(j=0;j<W/c;j++){
 
             //RAPPEL 
             // Vmax = 50    // define
@@ -408,7 +421,7 @@ void writePGM_SSE(image_SSE* dif, int k, char* dossier)
 	char nomFichier[50] = "";
 
 	Conc(dossier,k,nomFichier);
-	vuint8  x;
+	//vuint8  x;
 
 	fp = fopen(nomFichier,"w");
 	if(fp!=NULL)
@@ -417,12 +430,12 @@ void writePGM_SSE(image_SSE* dif, int k, char* dossier)
 		fprintf(fp,"%d %d\n",dif->w,dif->h);
 		fprintf(fp,"%d\n",dif->maxInt);
 
-		for(i=0;i<dif->h;i++)
+		for(i=0;i<H;i++)
 		{
-			for(j=0;j<dif->w/16;j++)
+			for(j=0;j<W/16;j++)
 			{
 				//x = _mm_load_si128(&dif->data[i][j]);
-				 fwrite(&(dif->data[i][j]), sizeof(vuint8), 1, fp);
+				fwrite(&dif->data[i][j], sizeof(vuint8), 1, fp);
 				
 				//fprintf(fp,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",(char)x[0],(char)x[1],(char)x[2],(char)x[3],(char)x[4],
 				//	(char)x[5],(char)x[6],(char)x[7],(char)x[8],(char)x[9],
@@ -445,15 +458,11 @@ void SD_Full_Step_NO_Morpho_SSE()
 
 	image_SSE ImageSSE1, Ot, Vt,  Mt;
 
-	readPGM_SSE("car3/car_3000.pgm",&ImageSSE1);
 	readPGM_SSE("car3/car_3001.pgm",&Mt);
-	//readPGM_SSE("car3/car_3000.pgm",&Vt);
-	
 
 
-	//initImageSSE(&ImageSSE2,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
-	initImageSSE(&Vt,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
-	initImageSSE(&Ot,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
+	initImageSSE(&Vt);
+	initImageSSE(&Ot);
 
 
 	for(i=0;i<199;i++){//199
@@ -472,13 +481,14 @@ void SD_Full_Step_NO_Morpho_SSE()
 		//copyImage_SSE_to_Image_t(&dif,&ImgRead);
 		//writePGM(&ImgRead,i,"FDSSE/FDSSEcar_");
 		writePGM_SSE(&Ot,i,"SDSSE/SDSSEcar_");
+
+		freeImageSSE(&ImageSSE1);
 	}
 
-	//printf("Fin FD sans morpho\n");
-	//freeImage_t(&ImgRead);
-	//freeImageSSE(&ImageSSE1);
-	//freeImageSSE(&ImageSSE2);
-	//freeImageSSE(&dif);
+	freeImageSSE(&Mt);
+	freeImageSSE(&Vt);
+	freeImageSSE(&Ot);
+
 
 }
 
@@ -493,15 +503,13 @@ void SD_Full_Step_Morpho3_3_SSE()
 
 	image_SSE ImageSSE1, Ot, Vt,  Mt,out;
 
-	readPGM_SSE("car3/car_3000.pgm",&ImageSSE1);
 	readPGM_SSE("car3/car_3001.pgm",&Mt);
 	
 
 
-	//initImageSSE(&ImageSSE2,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
-	initImageSSE(&Vt,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
-	initImageSSE(&Ot,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
-	initImageSSE(&out,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
+	initImageSSE(&Vt);
+	initImageSSE(&Ot);
+	initImageSSE(&out);
 
 	for(i=0;i<199;i++){//199
 		//i=0;
@@ -520,8 +528,14 @@ void SD_Full_Step_Morpho3_3_SSE()
 		//writePGM(&ImgRead,i,"FDSSE/FDSSEcar_");
 		morpho_SSE_Erosion3_3(&Ot, &out);
 		writePGM_SSE(&out,i,"SDSSE_Morpho3_3/SDSSEcar_");
+
+		freeImageSSE(&ImageSSE1);
 	}
 
+	freeImageSSE(&Mt);
+	freeImageSSE(&Vt);
+	freeImageSSE(&Ot);
+	freeImageSSE(&out);
 	//printf("Fin FD sans morpho\n");
 	//freeImage_t(&ImgRead);
 	//freeImageSSE(&ImageSSE1);
@@ -541,15 +555,11 @@ void SD_Full_Step_Morpho5_5_SSE()
 
 	image_SSE ImageSSE1, Ot, Vt,  Mt,out;
 
-	readPGM_SSE("car3/car_3000.pgm",&ImageSSE1);
 	readPGM_SSE("car3/car_3001.pgm",&Mt);
 	
-
-
-	//initImageSSE(&ImageSSE2,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
-	initImageSSE(&Vt,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
-	initImageSSE(&Ot,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
-	initImageSSE(&out,ImageSSE1.w,ImageSSE1.h,ImageSSE1.maxInt);
+	initImageSSE(&Vt);
+	initImageSSE(&Ot);
+	initImageSSE(&out);
 
 	for(i=0;i<199;i++){//199
 		//i=0;
@@ -568,7 +578,13 @@ void SD_Full_Step_Morpho5_5_SSE()
 		//writePGM(&ImgRead,i,"FDSSE/FDSSEcar_");
 		morpho_SSE_Erosion5_5(&Ot, &out);
 		writePGM_SSE(&out,i,"SDSSE_Morpho5_5/SDSSEcar_");
+		freeImageSSE(&ImageSSE1);
 	}
+
+	freeImageSSE(&Mt);
+	freeImageSSE(&Vt);
+	freeImageSSE(&Ot);
+	freeImageSSE(&out);
 
 	//printf("Fin FD sans morpho\n");
 	//freeImage_t(&ImgRead);
@@ -578,15 +594,3 @@ void SD_Full_Step_Morpho5_5_SSE()
 
 }
 
-void freeImageSSE(image_SSE* image)
-{
-
-	int i,j;
-
-	for(i=0;i<image->h;i++)
-	{
-		free_vui8vector(image->data[i], 0, 19);
-	}
-
-	free_vui8vector(image->data, 0, 239);
-}

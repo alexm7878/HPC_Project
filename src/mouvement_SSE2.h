@@ -29,7 +29,9 @@
 		vuint8 **data;
 	}image_SSE;
 
-	void initImageSSE(image_SSE* Image, int w, int h,int intensity);
+	void initImageSSE(image_SSE* Image);
+	void freeImageSSE(image_SSE* image);
+	
 	void copyImage_t_to_Image_SSE(image_t* imaget, image_SSE* imageSSE);
 	void copyImage_SSE_to_Image_t(image_SSE* imageSSE,image_t* imaget);
 	int readPGM_SSE(char* NomFichier, image_SSE* ImgRead);
@@ -46,7 +48,7 @@
 	void SD_Full_Step_Morpho3_3_SSE();
 	void SD_Full_Step_Morpho5_5_SSE();
 
-	void freeImageSSE(image_SSE* image);
+
 
 
 
