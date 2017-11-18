@@ -3,113 +3,10 @@
 #include "morpho.h"
 #include "benchmark.h"
 #include "ppm2pgm.h"
-
-#include "nrdef.h"
-#include "vnrdef.h"
-#include "nrutil.h"
+#include "util.h"
 
 
 
-
-uint8_t convLogicToBin(uint8_t t)
-{
-	if(t == 255)
-		return 1;
-	else
-		return 0;	
-}
-
-uint8_t convBinToLogic(uint8_t t)
-{
-	if(t == 1)
-		return 255;
-	else
-		return 0;	
-}
-
-//Initialisation d'une variable image_t
-void initImage_t(image_t* Image)
-{
-	int i,j;
-			//image_t Image0;
-			//Image0 = (image_t*) malloc(sizeof(image_t));
-			Image->w = W;
-			Image->h=H;
-			Image->maxInt = INTENSITY;
-
-			//Allocation de la matrice 
-			Image->data =ui8matrix(-2,H+2,-2,W+2);
-
-			for(i=-2;i<H+3;i++)
-			{
-				for(j=-2; j<W+3;j++)
-				{
-					Image->data[i][j] = 0;
-				}
-			}
-}
-
-void freeImage_t(image_t* Image)
-{
-		free_ui8matrix(Image->data,-2,Image->h+2,-2,Image->w+2);
-		//free(Image);
-}
-
-
-//Fonction permettant de remplir une variable de type image_t en lisant une image .PGM
-int readPGM(char* NomFichier, image_t* ImgRead)
-{
-	FILE* fp;
-	char motMagique[3]="";
-	char chaine[1000] = "";
-	int w,h,intensity;
-	int i,j;
-
-	fp=fopen(NomFichier,"r");
-	if(fp != NULL)
-	{	
-			// Lecture du mot permettant de reconnaitre le PGM 
-			fgets(chaine, 1000, fp);
-			strncpy(motMagique,chaine,2);
-		
-			if(strcmp(motMagique,"P5") !=0)
-			{
-				printf("Ce n'est pas un fichier PGM\n");
-				return -1;
-			}
-
-			//Suppression des lignes de commentaires
-			fgets(chaine, 1000, fp);
-			while(chaine[0] == '#')
-			{
-				fgets(chaine, 1000, fp);
-			}
-
-			fseek(fp, -(int)strlen(chaine), SEEK_CUR); // Retour en arrière car il y a eu saut de ligne dans le while
-			fscanf(fp,"%d %d \n",&w,&h); // Récupération de Width hight 
-			fscanf(fp,"%d \n",&intensity); // Récupération de intensity 
-
-
-			//initialisation de l'image
-			initImage_t(ImgRead);
-
-			//Lecture de chacune des valeurs 
-			for(i=0;i<H;i++)
-			{
-				for(j=0;j<W;j++)
-					ImgRead->data[i][j] =fgetc(fp);
-			}
-			fclose(fp);
-			return 0;
-		}
-	else
-	{
-			//printf("Fichier impossible à ouvrir\n");
-			return -1;
-	}
-	
-	return -1;
-}
 
 //execution de l'algorithm FD sur deux images
 void FD_1_Step(image_t* ImgRead1, image_t* ImgRead, image_t* dif)
@@ -136,98 +33,6 @@ void FD_1_Step(image_t* ImgRead1, image_t* ImgRead, image_t* dif)
 	}
 }
 
-// concatene le nom avec le nombre i pour créer un nom du type  car_3000.pgm
-void Conc(char* nom,int i,char* ret)
-{
-	char a[10];
-	strcpy(ret,nom);
-	sprintf(a,"%d",i);
-	strcat(ret,a);
-	strcat(ret,".pgm");
-}
-void ConcPPM(char* nom,int i,char* ret)
-{
-	char a[10];
-	strcpy(ret,nom);
-	sprintf(a,"%d",i);
-	strcat(ret,a);
-	strcat(ret,".ppm");
-}
-
-void cpy_Image(image_t* Mt, image_t* ImgRead)//********************* AJOUT
-{
-	int i,j;
-
-	for(i=0;i<H;i++)
-	{
-		for(j=0;j<W;j++)
-		{
-			Mt->data[i][j] = ImgRead->data[i][j];
-		}
-	}
-}
-
-// écrit le contenu de l'image_t dans un fichier au format .PGM 
-void writePGM(image_t* dif, int k, char* dossier)
-{
-
-	FILE* fp;
-	int i,j;
-	char nomFichier[50] = "";
-
-	Conc(dossier,k,nomFichier);
-
-	fp = fopen(nomFichier,"w");
-	if(fp!=NULL)
-	{
-		fprintf(fp,"P5\n");
-		fprintf(fp,"%d %d\n",dif->w,dif->h);
-		fprintf(fp,"%d\n",dif->maxInt);
-
-		for(i=0;i<H;i++)
-		{
-			for(j=0;j<W;j++)
-			{
-				fprintf(fp,"%c",dif->data[i][j]);
-			}
-		}	
-		fclose(fp);
-	}
-	
-
-}
-
-void writePPM(image_t* dif, int k, char* dossier)
-{
-
-	FILE* fp;
-	int i,j;
-	char nomFichier[50] = "";
-
-	Conc(dossier,k,nomFichier);
-	printf("%s\n",nomFichier);
-
-	fp = fopen(nomFichier,"w");
-	if(fp!=NULL)
-	{
-		fprintf(fp,"P6\n");
-		fprintf(fp,"%d %d\n",dif->w,dif->h);
-		fprintf(fp,"%d\n",dif->maxInt);
-
-		for(i=0;i<H;i++)
-		{
-			for(j=0;j<W;j++)
-			{
-				fprintf(fp,"%c",dif->data[i][j]);
-				fprintf(fp,"%c",dif->data[i][j]);
-				fprintf(fp,"%c",dif->data[i][j]);
-			}
-		}	
-		fclose(fp);
-	}
-	
-
-}
 
 // fonction lancant l'algorithm FD sur toute les photos
 void FD_Full_Step_NO_Morpho()
@@ -337,7 +142,7 @@ void FD_Full_Step_Morpho5_5()
 		FD_1_Step(&ImgRead1,&ImgRead,&dif);
 		//ouverture5_5(&dif,&inter,&out);
 
-		morpho_Dilatation5_5(&dif,&out);
+		morpho_Erosion5_5(&dif,&out);
 		writePGM(&out,i,"FD_Morpho5_5/FD_Morpho5_5_car_");
 
 		freeImage_t(&ImgRead);
@@ -395,18 +200,7 @@ void SD_1_step(image_t* ImgRead, image_t* Ot, image_t* Vt, image_t* Mt)
 
 }
 
-void setVal_image(image_t* img, int val)
-{
 
-	int i,j;
-	for(i=0;i<H;i++)
-	{
-		for(j=0;j<W;j++)
-		{
-			img->data[i][j] = val;
-		}
-	}
-}
 
 void SD_Full_Step_NO_Morpho()
 {
@@ -528,25 +322,4 @@ void SD_Full_Step_Morpho5_5()
 }
 
 
-void compareImage(image_t* image1, image_t* image2)
-{
-    int i,j;
-    int cpt=0;
 
-    for(i=0;i<H;i++)
-    {
-        for(j=0;j<W;j++)
-        {
-            if(image1->data[i][j] == image2->data[i][j])
-            {
-                cpt++;
-            }else
-            {
-                printf("ici erreur i = %d , j= %d\n",i,j);
-            }
-        }
-    }
-
-    printf("il a %d pixel corect sur %d, soit %f pourcent\n",cpt,240*320, cpt*100.0/(240*320));
-
-}

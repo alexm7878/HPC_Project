@@ -3,151 +3,6 @@
 
 
 
-void initImageSSE(image_SSE* Image)
-{
-	int i,j;
-	Image->w = W;
-	Image->h=H;
-	Image->maxInt = INTENSITY;
-
-	int card;
-  	int si0, si1; // scalar indices
-    int vi0, vi1; // vector indices
-    int mi0, mi1; // memory (bounded) indices
-
- 	card = card_vuint8();
-
-    Image->data = vui8vectorArray(-1, H+1);
-
-    si0 = -1;
-    si1 = W+1;
-    s2v1D(si0, si1, card, &vi0, &vi1);
-    v2m1D(vi0, vi1, card, &mi0, &mi1);
-
-    for(i=-1;i<H+2;i++)
-    {
-    	Image->data[i] = vui8vector(vi0, vi1);
-    }
-}
-
-void freeImageSSE(image_SSE* image)
-{
-
-	int i,j;
-
-	for(i=-1;i<H+2;i++)
-	{
-		free_vui8vector(image->data[i], -1, W/16);
-	}
-
-	free(image->data -1 );
-	//free_vui8vector(image->data, -1, H+1);
-}
-
-int readPGM_SSE(char* NomFichier, image_SSE* ImgRead)
-{
-	FILE* fp;
-	char motMagique[3]="";
-	char chaine[1000] = "";
-	int w,h,intensity;
-	int i,j,k;
-	char tabLect[16]="";
-	vuint8 x;
-
-	fp=fopen(NomFichier,"r");
-	if(fp != NULL)
-	{
-			// Lecture du mot permettant de reconnaitre le PGM 
-			fgets(chaine, 1000, fp);
-			strncpy(motMagique,chaine,2);
-		
-			if(strcmp(motMagique,"P5") !=0)
-			{
-				printf("Ce n'est pas un fichier PGM\n");
-				return -1;
-			}
-
-			//Suppression des lignes de commentaires
-			fgets(chaine, 1000, fp);
-			while(chaine[0] == '#')
-			{
-				fgets(chaine, 1000, fp);
-			}
-
-			fseek(fp, -(int)strlen(chaine), SEEK_CUR); // Retour en arrière car il y a eu saut de ligne dans le while
-			fscanf(fp,"%d %d \n",&w,&h); // Récupération de Width hight 
-			fscanf(fp,"%d \n",&intensity); // Récupération de intensity 
-
-
-			//initialisation de l'image
-			initImageSSE(ImgRead);
-
-			//Lecture de chacune des valeurs 
-			for(i=0;i<ImgRead->h;i++)
-			{
-				for(j=0;j<ImgRead->w;j+=16)
-				{
-					/*for(k=0;k<16;k++){
-						tabLect[k] = fgetc(fp);
-						
-					}*/
-					//fread(&x, sizeof(vuint8), 1, fp);
-					x =_mm_set_epi8(fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),
-						fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),
-						fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp));
-					_mm_store_si128(&ImgRead->data[i][j/16],x);
-				
-				}
-			}
-
-			fclose(fp);
-
-			return 0;
-		}
-	else
-	{
-			//printf("Fichier impossible à ouvrir\n");
-			return -1;
-	}
-	
-	return -1;
-}
-
-void copyImage_t_to_Image_SSE(image_t* imaget, image_SSE* imageSSE)
-{
-	int i,j,k;
-	vuint8 x;
-	int c = card_vuint8();
-	for(i=0;i<H;i++)
-		{
-			for(j=0;j<W;j+=c)
-			{
-						x =_mm_set_epi8(imaget->data[i][j+15],imaget->data[i][j+14],imaget->data[i][j+13],imaget->data[i][j+12],imaget->data[i][j+11],
-							imaget->data[i][j+10],imaget->data[i][j+9],imaget->data[i][j+8],imaget->data[i][j+7],imaget->data[i][j+6],imaget->data[i][j+5],imaget->data[i][j+4],
-							imaget->data[i][j+3],imaget->data[i][j+2],imaget->data[i][j+1],imaget->data[i][j]);
-						_mm_store_si128(&imageSSE->data[i][j/c],x);
-			}
-		}
-
-}
-
-void copyImage_SSE_to_Image_t(image_SSE* imageSSE,image_t* imaget)
-{
-	int i,j,k;
-	vuint8 T[1];
-	uint8 *p = (uint8*) T;
-	int c = card_vuint8();
-	for(i=0;i<H;i++)
-		{
-			for(j=0;j<W;j+=c)
-			{
-				 _mm_store_si128(T,imageSSE->data[i][j/c]);
-				 for(k=0;k<c;k++)
-					imaget->data[i][j+k] = p[k];
-			}
-		}
-
-}
 
 
 void FD_1_Step_SSE(image_SSE* ImageSSE1, image_SSE* ImageSSE2, image_SSE* Ot)
@@ -301,7 +156,7 @@ void FD_Full_Step_Morpho5_5_SSE()
 
 		FD_1_Step_SSE(&ImageSSE1,&ImageSSE2,&Ot);
 
-		morpho_SSE_Dilatation5_5(&Ot,&out);
+		morpho_SSE_Erosion5_5(&Ot,&out);
 		writePGM_SSE(&out,i,"FDSSE_Morpho5_5/FDSSEcar_");
 
 		freeImageSSE(&ImageSSE1);
@@ -318,27 +173,7 @@ void FD_Full_Step_Morpho5_5_SSE()
 	//freeImageSSE(&dif);
 }
 
-void cpySSE(image_SSE* in, image_SSE* out)
-{
 
-	int i,j;
-	for(i=0;i<H;i++)
-	{
-		for(j=0;j<W/16;j++)
-		{
-			_mm_store_si128(&out->data[i][j],in->data[i][j]);
-		}
-	}
-}
-
-
-
-vuint8 conv_simd_logic_bin(vuint8 t)
-{
-    vuint8 _1 =_mm_set1_epi8(1);
-    t = (vuint8)_mm_min_epu8(t,_1);
-
-}
 
 void SD_1_Step_SSE(image_SSE* ImgRead, image_SSE* Ot, image_SSE* Vt, image_SSE* Mt) // manque la condition ==  dans le premier et deuxieme if
 {
@@ -410,43 +245,6 @@ void SD_1_Step_SSE(image_SSE* ImgRead, image_SSE* Ot, image_SSE* Vt, image_SSE* 
 }
 
 
-
-
-
-void writePGM_SSE(image_SSE* dif, int k, char* dossier)
-{
-
-	FILE* fp;
-	int i,j;
-	char nomFichier[50] = "";
-
-	Conc(dossier,k,nomFichier);
-	//vuint8  x;
-
-	fp = fopen(nomFichier,"w");
-	if(fp!=NULL)
-	{
-		fprintf(fp,"P5\n");
-		fprintf(fp,"%d %d\n",dif->w,dif->h);
-		fprintf(fp,"%d\n",dif->maxInt);
-
-		for(i=0;i<H;i++)
-		{
-			for(j=0;j<W/16;j++)
-			{
-				//x = _mm_load_si128(&dif->data[i][j]);
-				fwrite(&dif->data[i][j], sizeof(vuint8), 1, fp);
-				
-				//fprintf(fp,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",(char)x[0],(char)x[1],(char)x[2],(char)x[3],(char)x[4],
-				//	(char)x[5],(char)x[6],(char)x[7],(char)x[8],(char)x[9],
-				//	(char)x[10],(char)x[11],(char)x[12],(char)x[13],(char)x[14],(char)x[15]);
-			}
-		}	
-		fclose(fp);
-	}
-	
-}
-
 void SD_Full_Step_NO_Morpho_SSE()
 {
 	//printf("Demarage FD sans morpho\n");
@@ -464,6 +262,7 @@ void SD_Full_Step_NO_Morpho_SSE()
 	initImageSSE(&Vt);
 	initImageSSE(&Ot);
 
+	setVal_image_SSE(&Vt, VMIN);
 
 	for(i=0;i<199;i++){//199
 		//i=0;

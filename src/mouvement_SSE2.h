@@ -1,7 +1,12 @@
 #ifndef MOUVEMENT_SSE2_H
 #define MOUVEMENT_SSE2_H
 
-#include "mouvement.h"
+
+
+	
+	#include "mouvement.h"
+	
+
 #define _mm_cmpge_epu8(a, b) \
         _mm_cmpeq_epi8(_mm_max_epu8(a, b), a)
 
@@ -19,23 +24,6 @@
     	_mm_min_epu8( _mm_or_si128(_mm_cmplt_epu8(_mm_sub_epi8(a,b),a) , _mm_cmplt_epu8(_mm_sub_epi8(a,b),b)) , _mm_sub_epi8(a,b) )
     	// MiIN[lt(sub, a) OR lt(sub,b)]
 
-
-
-
-	typedef struct image_SSE {
-		int w;
-		int h;
-		int maxInt;
-		vuint8 **data;
-	}image_SSE;
-
-	void initImageSSE(image_SSE* Image);
-	void freeImageSSE(image_SSE* image);
-	
-	void copyImage_t_to_Image_SSE(image_t* imaget, image_SSE* imageSSE);
-	void copyImage_SSE_to_Image_t(image_SSE* imageSSE,image_t* imaget);
-	int readPGM_SSE(char* NomFichier, image_SSE* ImgRead);
-	void writePGM_SSE(image_SSE* dif, int k, char* dossier);
 
 	void FD_1_Step_SSE(image_SSE* ImageSSE1, image_SSE* ImageSSE2, image_SSE* dif);
 	void FD_Full_Step_NO_Morpho_SSE();

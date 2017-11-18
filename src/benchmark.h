@@ -3,6 +3,7 @@
  #define NOMFICH_CPUINFO "/proc/cpuinfo"
 #include "mouvement.h"
 #include  "mouvement_SSE2.h"
+#include "util.h"
 
 #define NRUN 10
 

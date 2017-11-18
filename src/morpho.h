@@ -3,6 +3,7 @@
 #define MORPHO_H
 #include "mouvement_SSE2.h"
 #include "mouvement.h"
+#include "util.h"
 
 	void morpho_Erosion3_3(image_t* in, image_t* out);
 	void morpho_Dilatation3_3(image_t* in, image_t* out);
