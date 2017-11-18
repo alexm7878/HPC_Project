@@ -250,14 +250,14 @@ void initImageSSE(image_SSE* Image)
 
  	card = card_vuint8();
 
-    Image->data = vui8vectorArray(-1, H+1);
+    Image->data = vui8vectorArray(-2, H+2);
 
-    si0 = -1;
-    si1 = W+1;
+    si0 = -2;
+    si1 = W+2;
     s2v1D(si0, si1, card, &vi0, &vi1);
     v2m1D(vi0, vi1, card, &mi0, &mi1);
 
-    for(i=-1;i<H+2;i++)
+    for(i=-2;i<H+3;i++)
     {
     	Image->data[i] = vui8vector(vi0, vi1);
     }
@@ -268,12 +268,12 @@ void freeImageSSE(image_SSE* image)
 
 	int i,j;
 
-	for(i=-1;i<H+2;i++)
+	for(i=-2;i<H+3;i++)
 	{
 		free_vui8vector(image->data[i], -1, W/16);
 	}
 
-	free(image->data -1 );
+	free(image->data-2);
 	//free_vui8vector(image->data, -1, H+1);
 }
 

@@ -142,7 +142,7 @@ void FD_Full_Step_Morpho5_5()
 		FD_1_Step(&ImgRead1,&ImgRead,&dif);
 		//ouverture5_5(&dif,&inter,&out);
 
-		morpho_Erosion5_5(&dif,&out);
+		morpho_Dilatation5_5(&dif,&out);
 		writePGM(&out,i,"FD_Morpho5_5/FD_Morpho5_5_car_");
 
 		freeImage_t(&ImgRead);

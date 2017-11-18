@@ -156,7 +156,7 @@ void FD_Full_Step_Morpho5_5_SSE()
 
 		FD_1_Step_SSE(&ImageSSE1,&ImageSSE2,&Ot);
 
-		morpho_SSE_Erosion5_5(&Ot,&out);
+		morpho_SSE_Dilatation5_5_reducColumn(&Ot,&out);
 		writePGM_SSE(&out,i,"FDSSE_Morpho5_5/FDSSEcar_");
 
 		freeImageSSE(&ImageSSE1);
@@ -262,7 +262,7 @@ void SD_Full_Step_NO_Morpho_SSE()
 	initImageSSE(&Vt);
 	initImageSSE(&Ot);
 
-	setVal_image_SSE(&Vt, VMIN);
+	  setVal_image_SSE(&Vt, VMIN);
 
 	for(i=0;i<199;i++){//199
 		//i=0;
