@@ -1,12 +1,7 @@
 #ifndef MOUVEMENT_SSE2_H
 #define MOUVEMENT_SSE2_H
 
-
-
-	
-	#include "mouvement.h"
-	
-
+#include "mouvement.h"
 #define _mm_cmpge_epu8(a, b) \
         _mm_cmpeq_epi8(_mm_max_epu8(a, b), a)
 
@@ -21,8 +16,10 @@
     	_mm_max_epu8( _mm_or_si128(_mm_cmplt_epu8(_mm_add_epi8(a,b),a) , _mm_cmplt_epu8(_mm_add_epi8(a,b),b)) , _mm_add_epi8(a,b) )
     	// MAX[lt(add, a) OR lt(add,b)]    
 #define _mm_sub_epi8_limit(a,b) \
-    	_mm_min_epu8( _mm_or_si128(_mm_cmplt_epu8(_mm_sub_epi8(a,b),a) , _mm_cmplt_epu8(_mm_sub_epi8(a,b),b)) , _mm_sub_epi8(a,b) )
+    	_mm_min_epu8(_mm_cmpgt_epu8(a,b),_mm_sub_epi8(a,b))
+    	//_mm_min_epu8( _mm_or_si128(_mm_cmplt_epu8(_mm_sub_epi8(a,b),a) , _mm_cmplt_epu8(_mm_sub_epi8(a,b),b)) , _mm_sub_epi8(a,b) )
     	// MiIN[lt(sub, a) OR lt(sub,b)]
+
 
 
 	void FD_1_Step_SSE(image_SSE* ImageSSE1, image_SSE* ImageSSE2, image_SSE* dif);
@@ -35,6 +32,7 @@
 	void SD_Full_Step_NO_Morpho_SSE();
 	void SD_Full_Step_Morpho3_3_SSE();
 	void SD_Full_Step_Morpho5_5_SSE();
+
 
 
 

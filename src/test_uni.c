@@ -178,7 +178,7 @@ int main(){
 
 
 
-//test_unitaire_main();
+test_unitaire_main();
 
 
 	//chrono_Difference_FD();
@@ -190,8 +190,9 @@ int main(){
 	//chrono_Difference_SD();
 
 
-	FD_Full_Step_Morpho5_5_SSE();
-	FD_Full_Step_Morpho5_5();
+	//FD_Full_Step_Morpho5_5_SSE();
+	//FD_Full_Step_Morpho5_5();
+SD_Full_Step_NO_Morpho_SSE();
 
 	//chrono_Difference_morpho5_5_dilatation();
 
@@ -208,7 +209,7 @@ readPGM("Verite/car_100.pgm",&verite);
 
 	//FD_Full_Step_Morpho5_5();
 
-	compareImage(&image,&image2);
+	//compareImage(&image,&image2);
 	return 0;
 }
 
