@@ -31,8 +31,6 @@
 	
 
 	void FD_1_Step(image_t* ImgRead1, image_t* ImgRead, image_t* dif);
-
-	
 	void FD_Full_Step_NO_Morpho();
 	void FD_Full_Step_Morpho3_3();
 	void FD_Full_Step_Morpho5_5();
