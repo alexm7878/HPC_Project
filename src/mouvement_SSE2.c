@@ -13,7 +13,7 @@ void FD_1_Step_SSE(image_SSE* ImageSSE1, image_SSE* ImageSSE2, image_SSE* Ot)
 	vuint8  it, it_1, ot, zero, valMax, teta, max, min, sl;
  	zero =_mm_set1_epi8(0);
  	valMax = _mm_set1_epi8(255);
-	teta = _mm_set1_epi8(TETA);	// 20	// define
+	teta = _mm_set1_epi8(TETA);	
 
 	for(i=0;i<H;i++){
 		for(j=0;j<W/c;j++){
@@ -40,7 +40,7 @@ void FD_1_Step_SSE(image_SSE* ImageSSE1, image_SSE* ImageSSE2, image_SSE* Ot)
 
 void FD_Full_Step_NO_Morpho_SSE()
 {
-	//printf("Demarage FD sans morpho\n");
+	
 	image_t ImgRead;
 	image_t ImgRead1;
 	int i;
@@ -83,7 +83,7 @@ void FD_Full_Step_NO_Morpho_SSE()
 
 void FD_Full_Step_Morpho3_3_SSE()
 {
-	//printf("Demarage FD sans morpho\n");
+	
 	image_t ImgRead;
 	image_t ImgRead1;
 	int i;
@@ -131,7 +131,6 @@ void FD_Full_Step_Morpho3_3_SSE()
 void FD_Full_Step_Morpho5_5_SSE()
 {
 
-//printf("Demarage FD sans morpho\n");
 	image_t ImgRead;
 	image_t ImgRead1;
 	int i;
@@ -150,9 +149,7 @@ void FD_Full_Step_Morpho5_5_SSE()
 		Conc("car3/car_",3000+i+1,nomFichier2);
 
 		readPGM_SSE(nomFichier,&ImageSSE1);
-			//printf("L'image a bien été lu\n ");
 		readPGM_SSE(nomFichier2,&ImageSSE2);
-			//printf("L'image a bien été lu\n ");
 
 		FD_1_Step_SSE(&ImageSSE1,&ImageSSE2,&Ot);
 
@@ -166,7 +163,6 @@ void FD_Full_Step_Morpho5_5_SSE()
 	freeImageSSE(&Ot);
 	freeImageSSE(&out);
 	freeImageSSE(&inter);
-	//printf("Fin FD sans morpho\n");
 	//freeImage_t(&ImgRead);
 	//freeImageSSE(&ImageSSE1);
 	//freeImageSSE(&ImageSSE2);
@@ -190,27 +186,18 @@ void SD_1_Step_SSE(image_SSE* ImgRead, image_SSE* Ot, image_SSE* Vt, image_SSE* 
     for(i=0;i<H;i++){
         for(j=0;j<W/c;j++){
 
-            //RAPPEL 
-            // Vmax = 50    // define
-            // Vmin = 30    // define
-            // N = 3        // par defaut, define ne modifira pas celui-ci
-
-           // initialisation    
+           // Initialisation    
             mt = _mm_load_si128(&Mt->data[i][j]);
             vt = _mm_load_si128(&Vt->data[i][j]);
             img_read = _mm_load_si128(&ImgRead->data[i][j]);
 
-            //display_vuint8(mt, "%d ", "mt0 "); puts("");
-            //display_vuint8(img_read, "%d ", "ig0 "); puts("");
-            //display_vuint8(vt, "%d ", "vt0 "); puts("");
 
-            // STEP 1   
-            sl = _mm_cmplt_epu8(mt, img_read);  // 0xFF si a < b ; 0 si a > b
-            sg = _mm_cmpgt_epu8(mt, img_read);  // 0 si a < b; 0xFF si a > b
+           // STEP 1   
+            sl = _mm_cmplt_epu8(mt, img_read);  
+            sg = _mm_cmpgt_epu8(mt, img_read);  
 			
-            // convert 255 en 1 logique
-            mt = _mm_add_epi8_limit(mt, conv_simd_logic_bin(_mm_or_si128(_mm_and_si128(sl,valMax), zero)));     // mt ADD ( (Sg ET 255) OR 0 ) 
-            mt = _mm_sub_epi8_limit(mt, conv_simd_logic_bin(_mm_or_si128(_mm_and_si128(sg,valMax), zero)));     // mt SUB ( (Sl ET 255) OR 0 ) 
+            mt = _mm_add_epi8_limit(mt, conv_simd_logic_bin(_mm_or_si128(_mm_and_si128(sl,valMax), zero)));    
+            mt = _mm_sub_epi8_limit(mt, conv_simd_logic_bin(_mm_or_si128(_mm_and_si128(sg,valMax), zero)));  
 
 
            // STEP 2 // abs
@@ -219,17 +206,15 @@ void SD_1_Step_SSE(image_SSE* ImgRead, image_SSE* Ot, image_SSE* Vt, image_SSE* 
 
             ot = _mm_sub_epi8_limit(max, min);
 
-            // <=> N = 3  fonction _mm_mul = error
             ot_bis = _mm_add_epi8_limit(ot, ot);
             ot_bis = _mm_add_epi8_limit(ot_bis, ot);
             
            // STEP 3 
+            sl = _mm_cmplt_epu8(vt, ot_bis);    
+            sg = _mm_cmpgt_epu8(vt, ot_bis);   
 
-            sl = _mm_cmplt_epu8(vt, ot_bis);    //_mm_mul_epu32(n,ot)); // 0xFF si a < b ; 0 si a > b
-            sg = _mm_cmpgt_epu8(vt, ot_bis);    //_mm_mul_epu32(n,ot)); // 0 si a < b; 0xFF si a > b
-
-            vt = _mm_add_epi8_limit(vt, conv_simd_logic_bin(_mm_or_si128(_mm_and_si128(sg,valMax), zero)));     // mt ADD ( (Sl ET 255) OR 0 ) 
-            vt = _mm_sub_epi8_limit(vt, conv_simd_logic_bin(_mm_or_si128(_mm_and_si128(sl,valMax), zero))); // mt SUB ( (Sl ET 255) OR 0 ) 
+            vt = _mm_add_epi8_limit(vt, conv_simd_logic_bin(_mm_or_si128(_mm_and_si128(sg,valMax), zero)));    
+            vt = _mm_sub_epi8_limit(vt, conv_simd_logic_bin(_mm_or_si128(_mm_and_si128(sl,valMax), zero)));
 
             vt = _mm_max_epu8(_mm_min_epu8(vt,vmax), vmin);
 
@@ -247,7 +232,6 @@ void SD_1_Step_SSE(image_SSE* ImgRead, image_SSE* Ot, image_SSE* Vt, image_SSE* 
 
 void SD_Full_Step_NO_Morpho_SSE()
 {
-	//printf("Demarage FD sans morpho\n");
 	image_t ImgRead;
 	image_t ImgRead1;
 	int i;
@@ -264,16 +248,13 @@ void SD_Full_Step_NO_Morpho_SSE()
 
 	  setVal_image_SSE(&Vt, VMIN);
 
-	for(i=0;i<199;i++){//199
-		//i=0;
-		//printf("============== i = %d ====================\n\n\n\n\n",i);
+	for(i=0;i<199;i++){
+
 		Conc("car3/car_",3000+i,nomFichier);
 		//Conc("car3/car_",3000+i+1,nomFichier2);
 
 		readPGM_SSE(nomFichier,&ImageSSE1);
-			//printf("L'image a bien été lu\n ");
 		//readPGM_SSE(nomFichier2,&ImageSSE2);
-			//printf("L'image a bien été lu\n ");
 
 		SD_1_Step_SSE(&ImageSSE1, &Ot, &Vt,&Mt);
 
@@ -293,7 +274,6 @@ void SD_Full_Step_NO_Morpho_SSE()
 
 void SD_Full_Step_Morpho3_3_SSE()
 {
-	//printf("Demarage FD sans morpho\n");
 	image_t ImgRead;
 	image_t ImgRead1;
 	int i;
@@ -310,16 +290,13 @@ void SD_Full_Step_Morpho3_3_SSE()
 	initImageSSE(&Ot);
 	initImageSSE(&out);
 
-	for(i=0;i<199;i++){//199
-		//i=0;
-		//printf("============== i = %d ====================\n\n\n\n\n",i);
+	for(i=0;i<199;i++){
+
 		Conc("car3/car_",3000+i,nomFichier);
 		//Conc("car3/car_",3000+i+1,nomFichier2);
 
 		readPGM_SSE(nomFichier,&ImageSSE1);
-			//printf("L'image a bien été lu\n ");
 		//readPGM_SSE(nomFichier2,&ImageSSE2);
-			//printf("L'image a bien été lu\n ");
 
 		SD_1_Step_SSE(&ImageSSE1, &Ot, &Vt,&Mt);
 
@@ -335,7 +312,6 @@ void SD_Full_Step_Morpho3_3_SSE()
 	freeImageSSE(&Vt);
 	freeImageSSE(&Ot);
 	freeImageSSE(&out);
-	//printf("Fin FD sans morpho\n");
 	//freeImage_t(&ImgRead);
 	//freeImageSSE(&ImageSSE1);
 	//freeImageSSE(&ImageSSE2);
@@ -345,7 +321,6 @@ void SD_Full_Step_Morpho3_3_SSE()
 
 void SD_Full_Step_Morpho5_5_SSE()
 {
-	//printf("Demarage FD sans morpho\n");
 	image_t ImgRead;
 	image_t ImgRead1;
 	int i;
@@ -360,16 +335,12 @@ void SD_Full_Step_Morpho5_5_SSE()
 	initImageSSE(&Ot);
 	initImageSSE(&out);
 
-	for(i=0;i<199;i++){//199
-		//i=0;
-		//printf("============== i = %d ====================\n\n\n\n\n",i);
+	for(i=0;i<199;i++){
 		Conc("car3/car_",3000+i,nomFichier);
 		//Conc("car3/car_",3000+i+1,nomFichier2);
 
 		readPGM_SSE(nomFichier,&ImageSSE1);
-			//printf("L'image a bien été lu\n ");
 		//readPGM_SSE(nomFichier2,&ImageSSE2);
-			//printf("L'image a bien été lu\n ");
 
 		SD_1_Step_SSE(&ImageSSE1, &Ot, &Vt,&Mt);
 
@@ -385,7 +356,6 @@ void SD_Full_Step_Morpho5_5_SSE()
 	freeImageSSE(&Ot);
 	freeImageSSE(&out);
 
-	//printf("Fin FD sans morpho\n");
 	//freeImage_t(&ImgRead);
 	//freeImageSSE(&ImageSSE1);
 	//freeImageSSE(&ImageSSE2);
