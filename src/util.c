@@ -124,7 +124,7 @@ void ConcPPM(char* nom,int i,char* ret)
 	strcat(ret,".ppm");
 }
 
-void cpy_Image(image_t* Mt, image_t* ImgRead)//********************* AJOUT
+void cpy_Image(image_t* Mt, image_t* ImgRead)
 {
 	int i,j;
 
@@ -344,24 +344,6 @@ int readPGM_SSE(char* NomFichier, image_SSE* ImgRead)
 	}
 	
 	return -1;
-}
-
-void copyImage_t_to_Image_SSE(image_t* imaget, image_SSE* imageSSE)
-{
-	int i,j,k;
-	vuint8 x;
-	int c = card_vuint8();
-	for(i=0;i<H;i++)
-		{
-			for(j=0;j<W;j+=c)
-			{
-						x =_mm_set_epi8(imaget->data[i][j+15],imaget->data[i][j+14],imaget->data[i][j+13],imaget->data[i][j+12],imaget->data[i][j+11],
-							imaget->data[i][j+10],imaget->data[i][j+9],imaget->data[i][j+8],imaget->data[i][j+7],imaget->data[i][j+6],imaget->data[i][j+5],imaget->data[i][j+4],
-							imaget->data[i][j+3],imaget->data[i][j+2],imaget->data[i][j+1],imaget->data[i][j]);
-						_mm_store_si128(&imageSSE->data[i][j/c],x);
-			}
-		}
-
 }
 
 void copyImage_SSE_to_Image_t(image_SSE* imageSSE,image_t* imaget)

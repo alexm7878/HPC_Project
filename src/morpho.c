@@ -122,7 +122,7 @@ void ouverture5_5(image_t* in, image_t* inter, image_t* out)
 }
 
 
-//VERSION SSE
+// =========================== VERSION SSE =================================
 
 void morpho_SSE_Erosion3_3(image_SSE* in, image_SSE* out)
 {
