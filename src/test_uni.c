@@ -264,7 +264,7 @@ int main(){
 	//chrono_Difference_morpho5_5_erosion();
 	//chrono_Difference_morpho5_5_dilatation();
 	//chrono_Difference_SD();
-
+/*
 	FD_Full_Step_NO_Morpho();
 	FD_Full_Step_Morpho3_3();
 	FD_Full_Step_Morpho5_5();
@@ -277,8 +277,7 @@ int main(){
 	FD_Full_Step_NO_Morpho_SSE();
 	FD_Full_Step_Morpho3_3_SSE();
 	FD_Full_Step_Morpho5_5_SSE();
-	
-	SD_Full_Step_NO_Morpho_SSE();
+*/	SD_Full_Step_NO_Morpho_SSE();
 	SD_Full_Step_Morpho3_3_SSE();
 	SD_Full_Step_Morpho5_5_SSE();
 
