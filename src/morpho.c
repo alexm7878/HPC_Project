@@ -207,7 +207,9 @@ void morpho_SSE_Dilatation3_3(image_SSE* in, image_SSE* out)
 
 	for(i=0;i<in->h;i++)
 	{
-		for(j=0;j<in->w/16;j++)
+
+		res = _mm_set1_epi8(0);
+		for(j=1;j<in->w/16 -1;j++)
 		{
 			x = _mm_load_si128(&in->data[i-1][j]);
 			y = _mm_load_si128(&in->data[i][j]);
@@ -218,7 +220,7 @@ void morpho_SSE_Dilatation3_3(image_SSE* in, image_SSE* out)
 
 			//base décalé de 1 a droite
 			c0_dec1=_mm_bsrli_si128(c0,1);
-			c0_dec1 = _mm_and_si128(mask1_0,c0);
+			c0_dec1 = _mm_and_si128(mask1_0,c0_dec1);
 		
 			//base décalé de 1 a gauche
 			c0_decMoin1=_mm_bslli_si128(c0,1);
@@ -232,6 +234,7 @@ void morpho_SSE_Dilatation3_3(image_SSE* in, image_SSE* out)
 
 			c1 = _mm_or_si128(x,y);
 			c1 = _mm_or_si128(c1,z);
+
 			c1=_mm_bslli_si128(c1,15);
 			c1 = _mm_and_si128(mask1_255,c1);
 				
@@ -242,8 +245,10 @@ void morpho_SSE_Dilatation3_3(image_SSE* in, image_SSE* out)
 		
 			cMoin1 = _mm_or_si128(x,y);
 			cMoin1 = _mm_or_si128(cMoin1,z);
+
 			cMoin1=_mm_bsrli_si128(cMoin1,15);
 			cMoin1 = _mm_and_si128(mask1_255_inv,cMoin1);
+
 
 			res = _mm_or_si128(c0,c0_dec1);
 			res = _mm_or_si128(res,c0_decMoin1);
@@ -425,7 +430,7 @@ void morpho_SSE_Dilatation5_5(image_SSE* in, image_SSE* out)
 
 	for(i=0;i<in->h;i++)
 	{
-		for(j=0;j<in->w/16;j++)
+		for(j=1;j<in->w/16 -1;j++)
 		{
 		v =  _mm_load_si128(&in->data[i-2][j]);
 		w =  _mm_load_si128(&in->data[i-1][j]);
@@ -487,11 +492,13 @@ void morpho_SSE_Dilatation5_5(image_SSE* in, image_SSE* out)
 	//	display_vuint8(res2, "%d ", "res2 "); puts(""); 
 
 	//RECUPERATION DE LA LIGNE PRECEDENTE
-	v =  _mm_load_si128(&in->data[i-2][j-1]);
-		w =  _mm_load_si128(&in->data[i-1][j-1]);
-		x = _mm_load_si128(&in->data[i][j-1]);
-		y = _mm_load_si128(&in->data[i+1][j-1]);
-		z = _mm_load_si128(&in->data[i+2][j-1]);
+	
+			v =  _mm_load_si128(&in->data[i-2][j-1]);
+			w =  _mm_load_si128(&in->data[i-1][j-1]);
+			x = _mm_load_si128(&in->data[i][j-1]);
+			y = _mm_load_si128(&in->data[i+1][j-1]);
+			z = _mm_load_si128(&in->data[i+2][j-1]);
+		
 		
 		cMoin1 = _mm_or_si128(x,y);
 		cMoin1 = _mm_or_si128(cMoin1,z);

@@ -239,6 +239,7 @@ void compareImage(image_t* image1, image_t* image2)
 void initImageSSE(image_SSE* Image)
 {
 	int i,j;
+	vuint8 res =  _mm_set1_epi8(0);
 	Image->w = W;
 	Image->h=H;
 	Image->maxInt = INTENSITY;
@@ -252,8 +253,8 @@ void initImageSSE(image_SSE* Image)
 
     Image->data = vui8vectorArray(-2, H+2);
 
-    si0 = -2;
-    si1 = W+2;
+    si0 = -1;
+    si1 = W+1;
     s2v1D(si0, si1, card, &vi0, &vi1);
     v2m1D(vi0, vi1, card, &mi0, &mi1);
 
@@ -261,6 +262,10 @@ void initImageSSE(image_SSE* Image)
     {
     	Image->data[i] = vui8vector(vi0, vi1);
     }
+    
+
+
+
 }
 
 void freeImageSSE(image_SSE* image)
