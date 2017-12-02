@@ -247,14 +247,14 @@ int main(){
 	__m128i _255= _mm_setr_epi8(255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255);
 
 	
-	printf("val = 0, 1, 127, 128, 254, 255\n\n");
+	//printf("val = 0, 1, 127, 128, 254, 255\n\n");
 
-	test_mm_cmplt_epu8(val, _0, _1, _127, _128, _254, _255);
-	test_mm_cmpgt_epu8(val, _0, _1, _127, _128, _254, _255);
-	test_mm_add_epi8_limit(val, _0, _1, _127, _128, _254, _255);
-	test_mm_sub_epi8_limit(val, _0, _1, _127, _128, _254, _255);
-	test_mm_max_epu8(val, _0, _1, _127, _128, _254, _255);
-	test_mm_min_epu8(val, _0, _1, _127, _128, _254, _255);
+	//test_mm_cmplt_epu8(val, _0, _1, _127, _128, _254, _255);
+	//test_mm_cmpgt_epu8(val, _0, _1, _127, _128, _254, _255);
+	//test_mm_add_epi8_limit(val, _0, _1, _127, _128, _254, _255);
+	//test_mm_sub_epi8_limit(val, _0, _1, _127, _128, _254, _255);
+	//test_mm_max_epu8(val, _0, _1, _127, _128, _254, _255);
+	//test_mm_min_epu8(val, _0, _1, _127, _128, _254, _255);
 
 
 	//chrono_Difference_FD();
@@ -263,21 +263,22 @@ int main(){
 	//chrono_Difference_morpho3_3_erosion();
 	//chrono_Difference_morpho5_5_erosion();
 	//chrono_Difference_morpho5_5_dilatation();
-	//chrono_Difference_SD();
+	chrono_Difference_SD();
 /*
 	FD_Full_Step_NO_Morpho();
 	FD_Full_Step_Morpho3_3();
 	FD_Full_Step_Morpho5_5();
-
+*/
 	SD_Full_Step_NO_Morpho();
 	SD_Full_Step_Morpho3_3();
 	SD_Full_Step_Morpho5_5();
-
+/*
 
 	FD_Full_Step_NO_Morpho_SSE();
 	FD_Full_Step_Morpho3_3_SSE();
 	FD_Full_Step_Morpho5_5_SSE();
-*/	SD_Full_Step_NO_Morpho_SSE();
+*/
+	SD_Full_Step_NO_Morpho_SSE();
 	SD_Full_Step_Morpho3_3_SSE();
 	SD_Full_Step_Morpho5_5_SSE();
 
@@ -286,17 +287,15 @@ int main(){
 	int MROC[2][2]={0,0,0,0};
 	image_t image,verite,image2;
 
-	readPGM("FDSSE_Morpho5_5/FDSSEcar_99.pgm",&image);
-	readPGM("FD_Morpho5_5/FD_Morpho5_5_car_99.pgm",&image2);
-	readPGM("Verite/car_100.pgm",&verite);
+	readPGM("SDSSE/SDSSEcar_99.pgm",&image);
+	readPGM("SD/SDcar_99.pgm",&image2);
+	//readPGM("Verite/car_100.pgm",&verite);
 	//roc(&image,&verite,MROC);
 	//displayROC(MROC);
-	
-
 
 	//FD_Full_Step_Morpho5_5();
+	compareImage(&image,&image2);
 
-	//compareImage(&image,&image2);
 	return 0;
 }
 

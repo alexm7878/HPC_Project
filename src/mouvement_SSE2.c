@@ -26,10 +26,10 @@ void FD_1_Step_SSE(image_SSE* ImageSSE1, image_SSE* ImageSSE2, image_SSE* Ot)
 			max = _mm_max_epu8(it, it_1);
            	min = _mm_min_epu8(it, it_1);
             
-            ot = _mm_sub_epi8_limit(max, min);
+            ot = _mm_sub_epi8(max, min);
 
             // STEP 2
-            //ot = _mm_cmpgt_epu8(ot,teta);
+           // ot = _mm_cmplt_epu8(teta,ot);
             sl = _mm_cmplt_epu8(ot,teta);
             ot = _mm_or_si128(_mm_andnot_si128(sl,valMax), zero);
 
@@ -70,7 +70,11 @@ void FD_Full_Step_NO_Morpho_SSE()
 	}
 
 	freeImageSSE(&Ot);
-
+	//printf("Fin FD sans morpho\n");
+	//freeImage_t(&ImgRead);
+	//freeImageSSE(&ImageSSE1);
+	//freeImageSSE(&ImageSSE2);
+	//freeImageSSE(&dif);
 
 }
 
@@ -102,7 +106,7 @@ void FD_Full_Step_Morpho3_3_SSE()
  
 		//fermeture_SSE3_3(&Ot,&inter,&out);
 		//ouverture_SSE3_3(&out,&inter,&Ot);
-		morpho_SSE_Dilatation3_3(&Ot,&out);
+		morpho_SSE_Erosion3_3(&Ot,&out);
 		writePGM_SSE(&out,i,"FDSSE_Morpho3_3/FDSSEcar_");
 
 		freeImageSSE(&ImageSSE1);
@@ -112,6 +116,13 @@ void FD_Full_Step_Morpho3_3_SSE()
 	freeImageSSE(&Ot);
 	freeImageSSE(&out);
 	freeImageSSE(&inter);
+
+	//printf("Fin FD sans morpho\n");
+	//freeImage_t(&ImgRead);
+	//freeImageSSE(&ImageSSE1);
+	//freeImageSSE(&ImageSSE2);
+	//freeImageSSE(&dif);
+
 }
 
 void FD_Full_Step_Morpho5_5_SSE()
@@ -149,6 +160,10 @@ void FD_Full_Step_Morpho5_5_SSE()
 	freeImageSSE(&Ot);
 	freeImageSSE(&out);
 	freeImageSSE(&inter);
+	//freeImage_t(&ImgRead);
+	//freeImageSSE(&ImageSSE1);
+	//freeImageSSE(&ImageSSE2);
+	//freeImageSSE(&dif);
 }
 
 
@@ -179,8 +194,8 @@ void SD_1_Step_SSE(image_SSE* ImgRead, image_SSE* Ot, image_SSE* Vt, image_SSE* 
             sl = _mm_cmplt_epu8(mt, img_read);  
             sg = _mm_cmpgt_epu8(mt, img_read);  
 			
-			mt = _mm_add_epi8_limit(mt, conv_simd_logic_bin(_mm_andnot_si128(sg, un)));    
-            mt = _mm_sub_epi8_limit(mt, conv_simd_logic_bin(_mm_andnot_si128(sl, un)));
+			mt = _mm_add_epi8(mt, conv_simd_logic_bin(_mm_andnot_si128(sg, un)));    
+            mt = _mm_sub_epi8(mt, conv_simd_logic_bin(_mm_andnot_si128(sl, un)));
             //mt = _mm_add_epi8_limit(mt, conv_simd_logic_bin(_mm_or_si128(_mm_and_si128(sl,valMax), zero)));    
             //mt = _mm_sub_epi8_limit(mt, conv_simd_logic_bin(_mm_or_si128(_mm_and_si128(sg,valMax), zero)));  
 
@@ -189,7 +204,7 @@ void SD_1_Step_SSE(image_SSE* ImgRead, image_SSE* Ot, image_SSE* Vt, image_SSE* 
             max = _mm_max_epu8(mt, img_read);
             min = _mm_min_epu8(mt, img_read);
 
-            ot = _mm_sub_epi8_limit(max, min);
+            ot = _mm_sub_epi8(max, min);
 
             ot_bis = _mm_add_epi8_limit(ot, ot);
             ot_bis = _mm_add_epi8_limit(ot_bis, ot);
@@ -198,17 +213,17 @@ void SD_1_Step_SSE(image_SSE* ImgRead, image_SSE* Ot, image_SSE* Vt, image_SSE* 
             sl = _mm_cmplt_epu8(vt, ot_bis);    
             sg = _mm_cmpgt_epu8(vt, ot_bis);   
 
-            vt = _mm_add_epi8_limit(vt, conv_simd_logic_bin(_mm_andnot_si128(sg, un)));    
-            vt = _mm_sub_epi8_limit(vt, conv_simd_logic_bin(_mm_andnot_si128(sl, un)));
+            vt = _mm_add_epi8(vt, conv_simd_logic_bin(_mm_andnot_si128(sg, un)));    
+            vt = _mm_sub_epi8(vt, conv_simd_logic_bin(_mm_andnot_si128(sl, un)));
             //vt = _mm_add_epi8_limit(vt, conv_simd_logic_bin(_mm_or_si128(_mm_and_si128(sg,valMax), zero)));    
             //vt = _mm_sub_epi8_limit(vt, conv_simd_logic_bin(_mm_or_si128(_mm_and_si128(sl,valMax), zero)));
 
             vt = _mm_max_epu8(_mm_min_epu8(vt,vmax), vmin);
 
            // STEP 4 
-            ot = _mm_cmpgt_epu8(ot,vt);
-           // sl = _mm_cmplt_epu8(ot,vt);
-            //ot = _mm_or_si128(_mm_andnot_si128(sl,valMax), zero);
+            //ot = _mm_cmpgt_epu8(ot,vt);
+            sl = _mm_cmplt_epu8(ot,vt);
+            ot = _mm_or_si128(_mm_andnot_si128(sl,valMax), zero);
 
 
             _mm_store_si128(&Ot->data[i][j],ot);
@@ -301,6 +316,10 @@ void SD_Full_Step_Morpho3_3_SSE()
 	freeImageSSE(&Vt);
 	freeImageSSE(&Ot);
 	freeImageSSE(&out);
+	//freeImage_t(&ImgRead);
+	//freeImageSSE(&ImageSSE1);
+	//freeImageSSE(&ImageSSE2);
+	//freeImageSSE(&dif);
 
 }
 
@@ -340,6 +359,11 @@ void SD_Full_Step_Morpho5_5_SSE()
 	freeImageSSE(&Vt);
 	freeImageSSE(&Ot);
 	freeImageSSE(&out);
+
+	//freeImage_t(&ImgRead);
+	//freeImageSSE(&ImageSSE1);
+	//freeImageSSE(&ImageSSE2);
+	//freeImageSSE(&dif);
 
 }
 
