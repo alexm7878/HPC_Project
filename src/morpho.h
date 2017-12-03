@@ -2,8 +2,6 @@
 #ifndef MORPHO_H
 #define MORPHO_H
 #include "mouvement_SSE2.h"
-//#include "mouvement.h"
-//#include "util.h"
 
 
 	// Version scalaire
@@ -30,7 +28,7 @@
 	void fermeture_SSE5_5(image_SSE* in, image_SSE* inter, image_SSE* out);
 	void ouverture_SSE5_5(image_SSE* in, image_SSE* inter, image_SSE* out);
 	
-
+	
 	void morpho_SSE_Erosion3_3_reducColumn(image_SSE* in, image_SSE* out);
 	void morpho_SSE_Dilatation3_3_reducColumn(image_SSE* in, image_SSE* out);
 	void morpho_SSE_Erosion5_5_reducColumn(image_SSE* in, image_SSE* out);

@@ -1,12 +1,7 @@
 #ifndef MOUVEMENT_H
 #define MOUVEMENT_H
 
-	
 
-
-
-
-	
 	#include "util.h"
 
 	#define H 240
@@ -26,9 +21,6 @@
 	static uint8_t iminarg1,iminarg2;
 	#define MIN(a,b) (iminarg1=(a),iminarg2=(b),(iminarg1) < (iminarg2) ?\
 	        (iminarg1) : (iminarg2))
-
-	
-	
 
 	void FD_1_Step(image_t* ImgRead1, image_t* ImgRead, image_t* dif);
 	void FD_Full_Step_NO_Morpho();
