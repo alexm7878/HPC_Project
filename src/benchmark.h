@@ -1,6 +1,6 @@
 #ifndef BENCHMARK_H
 #define BENCHMARK_H
- #define NOMFICH_CPUINFO "/proc/cpuinfo"
+#define NOMFICH_CPUINFO "/proc/cpuinfo"
 #include  "mouvement_SSE2.h"
 
 

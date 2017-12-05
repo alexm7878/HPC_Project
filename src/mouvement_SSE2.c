@@ -142,7 +142,7 @@ void FD_Full_Step_Morpho5_5_SSE()
 
 
 
-void SD_1_Step_SSE(image_SSE* ImgRead, image_SSE* Ot, image_SSE* Vt, image_SSE* Mt) // manque la condition ==  dans le premier et deuxieme if
+void SD_1_Step_SSE(image_SSE* ImgRead, image_SSE* Ot, image_SSE* Vt, image_SSE* Mt) 
 {
 
     int i,j;

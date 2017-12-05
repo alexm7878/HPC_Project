@@ -1,6 +1,13 @@
- 	Utilisation de notre programme : 
-Ouvrir le fichier test_uni.c.
-Dans le main décommenter / commenter se que vous voulez voir ou ne pas voir.
-Dans un terminal lancer la commande make, il va créer l'exécutable ainsi que les dossiers ou seront stocker les photo, prévoir de la place.
-Enfin exécuter le programme.
+ 	
+
+
+=========== Utilisation de notre programme =========== 
+
+> Ouvrir le fichier test_uni.c.
+> Dans le main décommenter / commenter ce qui est désiré.
+> Lancé la commande make dans le répertoir via le terminal.
+	> Creation de l executable.
+	> Creation des differents dossiers utiles au programme (max 178 Mo).
+> Executer le programme.
+> make clean supprimer tous les dossiers, photos et executables
 La commande make clean supprime aussi les dossiers de photos qui ont été créer.

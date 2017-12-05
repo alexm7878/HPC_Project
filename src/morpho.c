@@ -156,7 +156,7 @@ void morpho_SSE_Erosion3_3(image_SSE* in, image_SSE* out)
 			c0_decMoin1=_mm_bslli_si128(c0,1);
 			c0_decMoin1 = _mm_or_si128(mask1_255_inv,c0_decMoin1);
 
-			//RECUPERATION DE LA LIGNE suivante
+			//RECUPERATION DE LA LIGNE SUIVANTE
 			x = _mm_load_si128(&in->data[i-1][j+1]);
 			y = _mm_load_si128(&in->data[i][j+1]);
 			z = _mm_load_si128(&in->data[i+1][j+1]);
@@ -225,7 +225,7 @@ void morpho_SSE_Dilatation3_3(image_SSE* in, image_SSE* out)
 			c0_decMoin1 = _mm_and_si128(mask1_0_inv,c0_decMoin1);
 
 
-			//RECUPERATION DE LA LIGNE suivante
+			//RECUPERATION DE LA LIGNE SUIVANTE
 			x = _mm_load_si128(&in->data[i-1][j+1]);
 			y = _mm_load_si128(&in->data[i][j+1]);
 			z = _mm_load_si128(&in->data[i+1][j+1]);
@@ -323,7 +323,7 @@ void morpho_SSE_Erosion5_5(image_SSE* in, image_SSE* out)
 		c0_decMoin2=_mm_bslli_si128(c0,2);
 		c0_decMoin2 = _mm_or_si128(mask2_255_inv,c0_decMoin2);
 
-		//RECUPERATION DE LA LIGNE suivante
+		//RECUPERATION DE LA LIGNE SUIVANTE
 		v =  _mm_load_si128(&in->data[i-2][j+1]);
 		w =  _mm_load_si128(&in->data[i-1][j+1]);
 		x = _mm_load_si128(&in->data[i][j+1]);
@@ -425,7 +425,7 @@ void morpho_SSE_Dilatation5_5(image_SSE* in, image_SSE* out)
 		c0_decMoin2=_mm_bslli_si128(c0,2);
 		c0_decMoin2 = _mm_and_si128(mask2_0_inv,c0_decMoin2);
 
-		//RECUPERATION DE LA LIGNE suivante
+		//RECUPERATION DE LA LIGNE SUIVANTE
 		v =  _mm_load_si128(&in->data[i-2][j+1]);
 		w =  _mm_load_si128(&in->data[i-1][j+1]);
 		x = _mm_load_si128(&in->data[i][j+1]);
@@ -445,12 +445,11 @@ void morpho_SSE_Dilatation5_5(image_SSE* in, image_SSE* out)
 		c1_dec2 = _mm_and_si128(mask2_255,c1_dec2);
 
 		//RECUPERATION DE LA LIGNE PRECEDENTE
-	
-			v =  _mm_load_si128(&in->data[i-2][j-1]);
-			w =  _mm_load_si128(&in->data[i-1][j-1]);
-			x = _mm_load_si128(&in->data[i][j-1]);
-			y = _mm_load_si128(&in->data[i+1][j-1]);
-			z = _mm_load_si128(&in->data[i+2][j-1]);
+		v =  _mm_load_si128(&in->data[i-2][j-1]);
+		w =  _mm_load_si128(&in->data[i-1][j-1]);
+		x = _mm_load_si128(&in->data[i][j-1]);
+		y = _mm_load_si128(&in->data[i+1][j-1]);
+		z = _mm_load_si128(&in->data[i+2][j-1]);
 		
 		
 		cMoin1 = _mm_or_si128(x,y);
@@ -526,7 +525,7 @@ void morpho_SSE_Erosion3_3_reducColumn(image_SSE* in, image_SSE* out)
 		for(j=0;j<in->w/16;j++)
 		{
 			
-			//RECUPERATION DE LA LIGNE suivante
+			//RECUPERATION DE LA LIGNE SUIVANTE
 			x = _mm_load_si128(&in->data[i-1][j+1]);
 			y = _mm_load_si128(&in->data[i][j+1]);
 			z = _mm_load_si128(&in->data[i+1][j+1]);
@@ -606,7 +605,7 @@ void morpho_SSE_Dilatation3_3_reducColumn(image_SSE* in, image_SSE* out)
 			c0_decMoin1 = _mm_and_si128(mask1_0_inv,c0_decMoin1);
 			
 
-			//RECUPERATION DE LA LIGNE suivante
+			//RECUPERATION DE LA LIGNE SUIVANTE
 			x = _mm_load_si128(&in->data[i-1][j+1]);
 			y = _mm_load_si128(&in->data[i][j+1]);
 			z = _mm_load_si128(&in->data[i+1][j+1]);
@@ -700,7 +699,7 @@ void morpho_SSE_Erosion5_5_reducColumn(image_SSE* in, image_SSE* out)
 		c0_decMoin2=_mm_bslli_si128(c0,2);
 		c0_decMoin2 = _mm_or_si128(mask2_255_inv,c0_decMoin2);
 
-		//RECUPERATION DE LA LIGNE suivante
+		//RECUPERATION DE LA LIGNE SUIVANTE
 		v =  _mm_load_si128(&in->data[i-2][j+1]);
 		w =  _mm_load_si128(&in->data[i-1][j+1]);
 		x = _mm_load_si128(&in->data[i][j+1]);
@@ -806,7 +805,7 @@ void morpho_SSE_Dilatation5_5_reducColumn(image_SSE* in, image_SSE* out)
 		c0_decMoin2=_mm_bslli_si128(c0,2);
 		c0_decMoin2 = _mm_and_si128(mask2_0_inv,c0_decMoin2);
 
-		//RECUPERATION DE LA LIGNE suivante
+		//RECUPERATION DE LA LIGNE SUIVANTE
 		v =  _mm_load_si128(&in->data[i-2][j+1]);
 		w =  _mm_load_si128(&in->data[i-1][j+1]);
 		x = _mm_load_si128(&in->data[i][j+1]);

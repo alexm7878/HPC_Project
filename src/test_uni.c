@@ -271,7 +271,7 @@ int main(){
 	//SD_Full_Step_Morpho3_3();
 	//SD_Full_Step_Morpho5_5();
 
-	FD_Full_Step_NO_Morpho_SSE();
+	//FD_Full_Step_NO_Morpho_SSE();
 	//FD_Full_Step_Morpho3_3_SSE();
 	//FD_Full_Step_Morpho5_5_SSE();
 

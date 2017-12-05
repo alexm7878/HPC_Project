@@ -188,7 +188,7 @@ void SD_Full_Step_NO_Morpho()
         initImage_t(&Ot);
         initImage_t(&Vt);
 
-         readPGM("car3/car_3001.pgm",&Mt);
+        readPGM("car3/car_3001.pgm",&Mt);
 
 		setVal_image(&Vt,VMIN);
 
@@ -233,7 +233,7 @@ void SD_Full_Step_Morpho3_3()
 				morpho_Erosion3_3(&Ot,&out);
 
                 writePGM(&out,k,"SD_Morpho3_3/SDcar3_3_");
-                 freeImage_t(&ImgRead);
+                freeImage_t(&ImgRead);
         }
 
          freeImage_t(&Ot);
