@@ -1,9 +1,5 @@
 #include "util.h"
 
-
-
-
-
 uint8_t convLogicToBin(uint8_t t)
 {
 	if(t == 255)
@@ -24,8 +20,7 @@ uint8_t convBinToLogic(uint8_t t)
 void initImage_t(image_t* Image)
 {
 	int i,j;
-			//image_t Image0;
-			//Image0 = (image_t*) malloc(sizeof(image_t));
+
 			Image->w = W;
 			Image->h=H;
 			Image->maxInt = INTENSITY;
@@ -45,7 +40,6 @@ void initImage_t(image_t* Image)
 void freeImage_t(image_t* Image)
 {
 		free_ui8matrix(Image->data,-2,Image->h+2,-2,Image->w+2);
-		//free(Image);
 }
 
 
@@ -140,7 +134,6 @@ void cpy_Image(image_t* Mt, image_t* ImgRead)
 // écrit le contenu de l'image_t dans un fichier au format .PGM 
 void writePGM(image_t* dif, int k, char* dossier)
 {
-
 	FILE* fp;
 	int i,j;
 	char nomFichier[50] = "";
@@ -195,13 +188,10 @@ void writePPM(image_t* dif, int k, char* dossier)
 		}	
 		fclose(fp);
 	}
-	
-
 }
 
 void setVal_image(image_t* img, int val)
 {
-
 	int i,j;
 	for(i=0;i<H;i++)
 	{
@@ -230,7 +220,6 @@ void compareImage(image_t* image1, image_t* image2)
             }
         }
     }
-
     printf("il a %d pixel corect sur %d, soit %f pourcent\n",cpt,W*H, cpt*100.0/(W*H));
 
 }
@@ -262,15 +251,10 @@ void initImageSSE(image_SSE* Image)
     {
     	Image->data[i] = vui8vector(vi0, vi1);
     }
-    
-
-
-
 }
 
 void freeImageSSE(image_SSE* image)
 {
-
 	int i,j;
 
 	for(i=-2;i<H+3;i++)
@@ -279,7 +263,6 @@ void freeImageSSE(image_SSE* image)
 	}
 
 	free(image->data-2);
-	//free_vui8vector(image->data, -1, H+1);
 }
 
 int readPGM_SSE(char* NomFichier, image_SSE* ImgRead)
@@ -304,7 +287,7 @@ int readPGM_SSE(char* NomFichier, image_SSE* ImgRead)
 				printf("Ce n'est pas un fichier PGM\n");
 				return -1;
 			}
-
+			
 			//Suppression des lignes de commentaires
 			fgets(chaine, 1000, fp);
 			while(chaine[0] == '#')
@@ -337,9 +320,7 @@ int readPGM_SSE(char* NomFichier, image_SSE* ImgRead)
 				
 				}
 			}
-
 			fclose(fp);
-
 			return 0;
 		}
 	else
@@ -347,7 +328,6 @@ int readPGM_SSE(char* NomFichier, image_SSE* ImgRead)
 			//printf("Fichier impossible à ouvrir\n");
 			return -1;
 	}
-	
 	return -1;
 }
 
@@ -366,12 +346,10 @@ void copyImage_SSE_to_Image_t(image_SSE* imageSSE,image_t* imaget)
 					imaget->data[i][j+k] = p[k];
 			}
 		}
-
 }
 
 void cpySSE(image_SSE* in, image_SSE* out)
 {
-
 	int i,j;
 	for(i=0;i<H;i++)
 	{
@@ -386,19 +364,16 @@ vuint8 conv_simd_logic_bin(vuint8 t)
 {
     vuint8 _1 =_mm_set1_epi8(1);
     t = (vuint8)_mm_min_epu8(t,_1);
-
 }
 
 
 void writePGM_SSE(image_SSE* dif, int k, char* dossier)
 {
-
 	FILE* fp;
 	int i,j;
 	char nomFichier[50] = "";
 
 	Conc(dossier,k,nomFichier);
-	//vuint8  x;
 
 	fp = fopen(nomFichier,"w");
 	if(fp!=NULL)
@@ -411,12 +386,7 @@ void writePGM_SSE(image_SSE* dif, int k, char* dossier)
 		{
 			for(j=0;j<W/16;j++)
 			{
-				//x = _mm_load_si128(&dif->data[i][j]);
 				fwrite(&dif->data[i][j], sizeof(vuint8), 1, fp);
-				
-				//fprintf(fp,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",(char)x[0],(char)x[1],(char)x[2],(char)x[3],(char)x[4],
-				//	(char)x[5],(char)x[6],(char)x[7],(char)x[8],(char)x[9],
-				//	(char)x[10],(char)x[11],(char)x[12],(char)x[13],(char)x[14],(char)x[15]);
 			}
 		}	
 		fclose(fp);
@@ -426,7 +396,6 @@ void writePGM_SSE(image_SSE* dif, int k, char* dossier)
 
 void setVal_image_SSE(image_SSE* img, int val)
 {
-
 	int i,j;
 	vuint8 value;
 	value = _mm_set1_epi8(val);
@@ -435,8 +404,6 @@ void setVal_image_SSE(image_SSE* img, int val)
 	{
 		for(j=0;j<W/16;j++)
 		{
-			
-			//
 			_mm_store_si128(&img->data[i][j],value);
 		}
 	}

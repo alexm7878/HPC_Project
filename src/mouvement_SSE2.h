@@ -15,7 +15,6 @@
     	_mm_min_epu8(_mm_cmpgt_epu8(a,b),_mm_sub_epi8(a,b))
 
 
-
 	void FD_1_Step_SSE(image_SSE* ImageSSE1, image_SSE* ImageSSE2, image_SSE* dif);
 	void FD_Full_Step_NO_Morpho_SSE();
 	void FD_Full_Step_Morpho3_3_SSE();
@@ -26,10 +25,4 @@
 	void SD_Full_Step_NO_Morpho_SSE();
 	void SD_Full_Step_Morpho3_3_SSE();
 	void SD_Full_Step_Morpho5_5_SSE();
-
-
-
-
-
-
 #endif

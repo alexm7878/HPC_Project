@@ -1,10 +1,6 @@
 
 #include "mouvement_SSE2.h"
 
-
-
-
-
 void FD_1_Step_SSE(image_SSE* ImageSSE1, image_SSE* ImageSSE2, image_SSE* Ot)
 {
 	int i,j;
@@ -29,7 +25,6 @@ void FD_1_Step_SSE(image_SSE* ImageSSE1, image_SSE* ImageSSE2, image_SSE* Ot)
             ot = _mm_sub_epi8(max, min);
 
             // STEP 2
-           // ot = _mm_cmplt_epu8(teta,ot);
             sl = _mm_cmplt_epu8(ot,teta);
             ot = _mm_or_si128(_mm_andnot_si128(sl,valMax), zero);
 
@@ -70,17 +65,10 @@ void FD_Full_Step_NO_Morpho_SSE()
 	}
 
 	freeImageSSE(&Ot);
-	//printf("Fin FD sans morpho\n");
-	//freeImage_t(&ImgRead);
-	//freeImageSSE(&ImageSSE1);
-	//freeImageSSE(&ImageSSE2);
-	//freeImageSSE(&dif);
-
 }
 
 void FD_Full_Step_Morpho3_3_SSE()
 {
-	
 	image_t ImgRead;
 	image_t ImgRead1;
 	int i;
@@ -98,14 +86,10 @@ void FD_Full_Step_Morpho3_3_SSE()
 		Conc("car3/car_",3000+i+1,nomFichier2);
 
 		readPGM_SSE(nomFichier,&ImageSSE1);
-			//printf("L'image a bien été lu\n ");
 		readPGM_SSE(nomFichier2,&ImageSSE2);
-			//printf("L'image a bien été lu\n ");
 
 		FD_1_Step_SSE(&ImageSSE1,&ImageSSE2,&Ot);
- 
-		//fermeture_SSE3_3(&Ot,&inter,&out);
-		//ouverture_SSE3_3(&out,&inter,&Ot);
+
 		morpho_SSE_Erosion3_3(&Ot,&out);
 		writePGM_SSE(&out,i,"FDSSE_Morpho3_3/FDSSEcar_");
 
@@ -116,12 +100,6 @@ void FD_Full_Step_Morpho3_3_SSE()
 	freeImageSSE(&Ot);
 	freeImageSSE(&out);
 	freeImageSSE(&inter);
-
-	//printf("Fin FD sans morpho\n");
-	//freeImage_t(&ImgRead);
-	//freeImageSSE(&ImageSSE1);
-	//freeImageSSE(&ImageSSE2);
-	//freeImageSSE(&dif);
 
 }
 
@@ -150,7 +128,7 @@ void FD_Full_Step_Morpho5_5_SSE()
 
 		FD_1_Step_SSE(&ImageSSE1,&ImageSSE2,&Ot);
 
-		morpho_SSE_Dilatation5_5_reducColumn(&Ot,&out);
+		morpho_SSE_Erosion5_5_reducColumn(&Ot,&out);
 		writePGM_SSE(&out,i,"FDSSE_Morpho5_5/FDSSEcar_");
 
 		freeImageSSE(&ImageSSE1);
@@ -160,10 +138,6 @@ void FD_Full_Step_Morpho5_5_SSE()
 	freeImageSSE(&Ot);
 	freeImageSSE(&out);
 	freeImageSSE(&inter);
-	//freeImage_t(&ImgRead);
-	//freeImageSSE(&ImageSSE1);
-	//freeImageSSE(&ImageSSE2);
-	//freeImageSSE(&dif);
 }
 
 
@@ -196,9 +170,6 @@ void SD_1_Step_SSE(image_SSE* ImgRead, image_SSE* Ot, image_SSE* Vt, image_SSE* 
 			
 			mt = _mm_add_epi8(mt, conv_simd_logic_bin(_mm_andnot_si128(sg, un)));    
             mt = _mm_sub_epi8(mt, conv_simd_logic_bin(_mm_andnot_si128(sl, un)));
-            //mt = _mm_add_epi8_limit(mt, conv_simd_logic_bin(_mm_or_si128(_mm_and_si128(sl,valMax), zero)));    
-            //mt = _mm_sub_epi8_limit(mt, conv_simd_logic_bin(_mm_or_si128(_mm_and_si128(sg,valMax), zero)));  
-
 
            // STEP 2 // abs
             max = _mm_max_epu8(mt, img_read);
@@ -215,13 +186,10 @@ void SD_1_Step_SSE(image_SSE* ImgRead, image_SSE* Ot, image_SSE* Vt, image_SSE* 
 
             vt = _mm_add_epi8(vt, conv_simd_logic_bin(_mm_andnot_si128(sg, un)));    
             vt = _mm_sub_epi8(vt, conv_simd_logic_bin(_mm_andnot_si128(sl, un)));
-            //vt = _mm_add_epi8_limit(vt, conv_simd_logic_bin(_mm_or_si128(_mm_and_si128(sg,valMax), zero)));    
-            //vt = _mm_sub_epi8_limit(vt, conv_simd_logic_bin(_mm_or_si128(_mm_and_si128(sl,valMax), zero)));
 
             vt = _mm_max_epu8(_mm_min_epu8(vt,vmax), vmin);
 
            // STEP 4 
-            //ot = _mm_cmpgt_epu8(ot,vt);
             sl = _mm_cmplt_epu8(ot,vt);
             ot = _mm_or_si128(_mm_andnot_si128(sl,valMax), zero);
 
@@ -255,15 +223,11 @@ void SD_Full_Step_NO_Morpho_SSE()
 	for(i=0;i<199;i++){
 
 		Conc("car3/car_",3000+i,nomFichier);
-		//Conc("car3/car_",3000+i+1,nomFichier2);
 
 		readPGM_SSE(nomFichier,&ImageSSE1);
-		//readPGM_SSE(nomFichier2,&ImageSSE2);
 
 		SD_1_Step_SSE(&ImageSSE1, &Ot, &Vt,&Mt);
 
-		//copyImage_SSE_to_Image_t(&dif,&ImgRead);
-		//writePGM(&ImgRead,i,"FDSSE/FDSSEcar_");
 		writePGM_SSE(&Ot,i,"SDSSE/SDSSEcar_");
 
 		freeImageSSE(&ImageSSE1);
@@ -297,15 +261,11 @@ void SD_Full_Step_Morpho3_3_SSE()
 	for(i=0;i<199;i++){
 
 		Conc("car3/car_",3000+i,nomFichier);
-		//Conc("car3/car_",3000+i+1,nomFichier2);
 
 		readPGM_SSE(nomFichier,&ImageSSE1);
-		//readPGM_SSE(nomFichier2,&ImageSSE2);
 
 		SD_1_Step_SSE(&ImageSSE1, &Ot, &Vt,&Mt);
 
-		//copyImage_SSE_to_Image_t(&dif,&ImgRead);
-		//writePGM(&ImgRead,i,"FDSSE/FDSSEcar_");
 		morpho_SSE_Erosion3_3(&Ot, &out);
 		writePGM_SSE(&out,i,"SDSSE_Morpho3_3/SDSSEcar_");
 
@@ -316,11 +276,6 @@ void SD_Full_Step_Morpho3_3_SSE()
 	freeImageSSE(&Vt);
 	freeImageSSE(&Ot);
 	freeImageSSE(&out);
-	//freeImage_t(&ImgRead);
-	//freeImageSSE(&ImageSSE1);
-	//freeImageSSE(&ImageSSE2);
-	//freeImageSSE(&dif);
-
 }
 
 void SD_Full_Step_Morpho5_5_SSE()
@@ -341,15 +296,11 @@ void SD_Full_Step_Morpho5_5_SSE()
 
 	for(i=0;i<199;i++){
 		Conc("car3/car_",3000+i,nomFichier);
-		//Conc("car3/car_",3000+i+1,nomFichier2);
 
 		readPGM_SSE(nomFichier,&ImageSSE1);
-		//readPGM_SSE(nomFichier2,&ImageSSE2);
 
 		SD_1_Step_SSE(&ImageSSE1, &Ot, &Vt,&Mt);
-
-		//copyImage_SSE_to_Image_t(&dif,&ImgRead);
-		//writePGM(&ImgRead,i,"FDSSE/FDSSEcar_");
+		
 		morpho_SSE_Erosion5_5(&Ot, &out);
 		writePGM_SSE(&out,i,"SDSSE_Morpho5_5/SDSSEcar_");
 		freeImageSSE(&ImageSSE1);
@@ -359,11 +310,5 @@ void SD_Full_Step_Morpho5_5_SSE()
 	freeImageSSE(&Vt);
 	freeImageSSE(&Ot);
 	freeImageSSE(&out);
-
-	//freeImage_t(&ImgRead);
-	//freeImageSSE(&ImageSSE1);
-	//freeImageSSE(&ImageSSE2);
-	//freeImageSSE(&dif);
-
 }
 

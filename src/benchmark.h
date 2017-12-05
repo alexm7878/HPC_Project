@@ -45,10 +45,4 @@
 	void chronoSD();
 	void chronoSD_SSE();
 	void chrono_Difference_SD();
-
-	
-	
-
-	
-
 #endif

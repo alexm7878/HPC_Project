@@ -14,7 +14,7 @@
 	#include "vnrdef.h"
 	#include "nrutil.h"
 
-
+// structure contenant une image version scalaire
 typedef struct image_t {
 		int w;
 		int h;
@@ -22,7 +22,7 @@ typedef struct image_t {
 		uint8_t** data;
 	}image_t;
 
-
+// structure contenant une image version SIMD
 typedef struct image_SSE {
 		int w;
 		int h;

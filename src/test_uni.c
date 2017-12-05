@@ -279,7 +279,6 @@ int main(){
 	//SD_Full_Step_Morpho3_3_SSE();
 	//SD_Full_Step_Morpho5_5_SSE();
 
-	//chrono_Difference_morpho5_5_dilatation();
 
 	/*
 	int MROC[2][2]={0,0,0,0};
