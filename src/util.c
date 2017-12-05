@@ -91,7 +91,6 @@ int readPGM(char* NomFichier, image_t* ImgRead)
 		}
 	else
 	{
-			//printf("Fichier impossible à ouvrir\n");
 			return -1;
 	}
 	
@@ -308,16 +307,7 @@ int readPGM_SSE(char* NomFichier, image_SSE* ImgRead)
 			{
 				for(j=0;j<ImgRead->w;j+=16)
 				{
-					/*for(k=0;k<16;k++){
-						tabLect[k] = fgetc(fp);
-						
-					}*/
-					//fread(&x, sizeof(vuint8), 1, fp);
-					x =_mm_set_epi8(fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),
-						fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp),
-						fgetc(fp),fgetc(fp),fgetc(fp),fgetc(fp));
-					_mm_store_si128(&ImgRead->data[i][j/16],x);
-				
+					fread(&x, sizeof(vuint8), 1, fp);
 				}
 			}
 			fclose(fp);
@@ -325,7 +315,6 @@ int readPGM_SSE(char* NomFichier, image_SSE* ImgRead)
 		}
 	else
 	{
-			//printf("Fichier impossible à ouvrir\n");
 			return -1;
 	}
 	return -1;
