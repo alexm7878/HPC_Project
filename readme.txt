@@ -10,4 +10,4 @@
 	> Creation des differents dossiers utiles au programme (max 178 Mo).
 > Executer le programme.
 > make clean supprimer tous les dossiers, photos et executables
-La commande make clean supprime aussi les dossiers de photos qui ont été créer.
+
