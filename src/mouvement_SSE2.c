@@ -177,7 +177,9 @@ void SD_1_Step_SSE(image_SSE* ImgRead, image_SSE* Ot, image_SSE* Vt, image_SSE* 
 
             ot = _mm_sub_epi8(max, min);
 
+            // N = 4	
             ot_bis = _mm_add_epi8_limit(ot, ot);
+            ot_bis = _mm_add_epi8_limit(ot_bis, ot);
             ot_bis = _mm_add_epi8_limit(ot_bis, ot);
             
            // STEP 3 

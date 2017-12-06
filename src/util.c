@@ -308,6 +308,7 @@ int readPGM_SSE(char* NomFichier, image_SSE* ImgRead)
 				for(j=0;j<ImgRead->w;j+=16)
 				{
 					fread(&x, sizeof(vuint8), 1, fp);
+					_mm_store_si128(&ImgRead->data[i][j/16],x);
 				}
 			}
 			fclose(fp);

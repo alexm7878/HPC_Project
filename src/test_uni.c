@@ -235,7 +235,7 @@ void test_mm_min_epu8(__m128i val,__m128i _0,__m128i _1,__m128i _127,__m128i _12
 
 int main(){
 
-	__m128i val = _mm_setr_epi8(0, 1, 127, 128, 254, 255,0,0,0,0,0,0,0,0,0,0);
+__m128i val = _mm_setr_epi8(0, 1, 127, 128, 254, 255,0,0,0,0,0,0,0,0,0,0);
 
 	__m128i _0= _mm_setr_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	__m128i _1= _mm_setr_epi8(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
@@ -271,13 +271,13 @@ int main(){
 	//SD_Full_Step_Morpho3_3();
 	//SD_Full_Step_Morpho5_5();
 
-	//FD_Full_Step_NO_Morpho_SSE();
-	//FD_Full_Step_Morpho3_3_SSE();
-	//FD_Full_Step_Morpho5_5_SSE();
+	FD_Full_Step_NO_Morpho_SSE();
+	FD_Full_Step_Morpho3_3_SSE();
+	FD_Full_Step_Morpho5_5_SSE();
 
-	//SD_Full_Step_NO_Morpho_SSE();
-	//SD_Full_Step_Morpho3_3_SSE();
-	//SD_Full_Step_Morpho5_5_SSE();
+	SD_Full_Step_NO_Morpho_SSE();
+	SD_Full_Step_Morpho3_3_SSE();
+	SD_Full_Step_Morpho5_5_SSE();
 
 
 	/*
